@@ -1,7 +1,7 @@
 package portfolio
 
 import (
-	"Profile_You/models"
+	"Portfolio_You/models"
 	"context"
 )
 
