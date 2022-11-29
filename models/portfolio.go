@@ -6,4 +6,6 @@ type Portfolio struct {
 	URL         string
 	CreaterName string
 	Name        string
+	Photo       string
+	Text        string
 }
