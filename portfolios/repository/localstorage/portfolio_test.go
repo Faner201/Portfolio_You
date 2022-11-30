@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPortfolioLocalStorage(t *testing.T) {
+func TestCreatePortfolio(t *testing.T) {
 	p := NewPortfolioLocalStorage()
 
 	user := &models.User{
@@ -18,34 +18,6 @@ func TestPortfolioLocalStorage(t *testing.T) {
 		Password: "locaut",
 		Email:    "polta@mail.ru",
 	}
-
-	for i := 0; i < 10; i++ {
-		portfolio := &models.Portfolio{
-			ID:          i + 1,
-			Tags:        "lopatka, kolpa, nikola",
-			URL:         "https://portfolio_you/&lopata/6",
-			CreaterName: "faner201",
-			Name:        "backend",
-			Photo:       "D/photo/lop.png",
-			Text:        "hahahahhahah text",
-		}
-
-		err := p.CreatePortfolio(context.Background(), portfolio, user)
-		assert.NoError(t, err)
-	}
-
-	returnedPortfolio, err := p.GetListPortfolioByUserName(context.Background(), "faner201")
-	assert.NoError(t, err)
-	assert.Equal(t, 10, len(returnedPortfolio))
-
-	returnedPortfolio, err = p.GetListPortfolioByUserName(context.Background(), "lodsfsdfs")
-	assert.Error(t, err)
-	assert.Equal(t, err, portfolios.ErrGetListPortfolio)
-
-}
-
-func TestPortolio(t *testing.T) {
-	p := NewPortfolioLocalStorage()
 
 	portfolio := &models.Portfolio{
 		ID:          1,
@@ -67,19 +39,69 @@ func TestPortolio(t *testing.T) {
 		Text:        "hahahahhahah text",
 	}
 
-	userOne := &models.User{
+	err := p.CreatePortfolio(context.Background(), portfolio, user)
+	assert.NoError(t, err)
+
+	err = p.CreatePortfolio(context.Background(), portfolioNotCreateName, user)
+	assert.Error(t, err)
+	assert.Equal(t, err, portfolios.ErrCreatePortfolio)
+}
+
+func TestGetListPortfolioByUserName(t *testing.T) {
+	p := NewPortfolioLocalStorage()
+
+	user := &models.User{
 		ID:       1,
 		Username: "faner201",
 		Password: "locaut",
 		Email:    "polta@mail.ru",
 	}
 
-	err := p.CreatePortfolio(context.Background(), portfolio, userOne)
-	assert.NoError(t, err)
+	for i := 0; i < 10; i++ {
+		portfolio := &models.Portfolio{
+			ID:          i + 1,
+			Tags:        "lopatka, kolpa, nikola",
+			URL:         "https://portfolio_you/&lopata/6",
+			CreaterName: "faner201",
+			Name:        "backend",
+			Photo:       "D/photo/lop.png",
+			Text:        "hahahahhahah text",
+		}
 
-	err = p.CreatePortfolio(context.Background(), portfolioNotCreateName, userOne)
+		p.CreatePortfolio(context.Background(), portfolio, user)
+	}
+
+	returnedPortfolio, err := p.GetListPortfolioByUserName(context.Background(), "faner201")
+	assert.NoError(t, err)
+	assert.Equal(t, 10, len(returnedPortfolio))
+
+	returnedPortfolio, err = p.GetListPortfolioByUserName(context.Background(), "lodsfsdfs")
 	assert.Error(t, err)
-	assert.Equal(t, err, portfolios.ErrCreatePortfolio)
+	assert.Equal(t, err, portfolios.ErrGetListPortfolio)
+
+}
+
+func TestGetPortfolioByUserName(t *testing.T) {
+	p := NewPortfolioLocalStorage()
+
+	portfolio := &models.Portfolio{
+		ID:          1,
+		Tags:        "lopatka, kolpa, nikola",
+		URL:         "https://portfolio_you/&lopata/6",
+		CreaterName: "faner201",
+		Name:        "backend",
+		Photo:       "D/photo/lop.png",
+		Text:        "hahahahhahah text",
+	}
+
+	user := &models.User{
+		ID:       1,
+		Username: "faner201",
+		Password: "locaut",
+		Email:    "polta@mail.ru",
+	}
+
+	p.CreatePortfolio(context.Background(), portfolio, user)
 
 	returnedPortfolio, err := p.GetPortfolioByUserName(context.Background(), "faner201", 1)
 	assert.NoError(t, err)
