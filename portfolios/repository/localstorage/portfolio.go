@@ -9,22 +9,26 @@ import (
 
 type portfolioLocalStorage struct {
 	portf map[int]*models.Portfolio
+	menus map[int]*models.Menu
 	mutex *sync.Mutex
 }
 
 func NewPortfolioLocalStorage() *portfolioLocalStorage {
 	return &portfolioLocalStorage{
 		portf: make(map[int]*models.Portfolio),
+		menus: make(map[int]*models.Menu),
 		mutex: new(sync.Mutex),
 	}
 }
 
-func (p *portfolioLocalStorage) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio, user *models.User) error {
+func (p *portfolioLocalStorage) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio, user *models.User, menu *models.Menu) error {
 	portfolio.CreaterName = user.Username
+	menu.CreaterName = user.Username
 
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
-	if portfolio.Name != "" && portfolio.Tags != "" && portfolio.Text != "" && portfolio.URL != "" {
+	if portfolio.Name != "" && portfolio.Tags != "" && portfolio.Text != "" && portfolio.URL != "" && menu.ShortText != "" {
+		p.menus[menu.ID] = menu
 		p.portf[portfolio.ID] = portfolio
 		return nil
 	}
@@ -45,19 +49,19 @@ func (p *portfolioLocalStorage) GetPortfolioByUserName(ctx context.Context, user
 	return nil, portfolios.ErrGetPortfolioByUserName
 }
 
-func (p *portfolioLocalStorage) GetListPortfolioByUserName(ctx context.Context, userName string) ([]*models.Portfolio, error) {
-	portf := make([]*models.Portfolio, 0)
+func (p *portfolioLocalStorage) GetListPortfolioByUserName(ctx context.Context, userName string) ([]*models.Menu, error) {
+	menus := make([]*models.Menu, 0)
 
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	for _, portfolio := range p.portf {
-		if portfolio.CreaterName == userName {
-			portf = append(portf, portfolio)
+	for _, menu := range p.menus {
+		if menu.CreaterName == userName {
+			menus = append(menus, menu)
 		} else {
 			return nil, portfolios.ErrGetListPortfolio
 		}
 	}
 
-	return portf, nil
+	return menus, nil
 }

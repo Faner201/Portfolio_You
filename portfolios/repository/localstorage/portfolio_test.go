@@ -23,26 +23,33 @@ func TestCreatePortfolio(t *testing.T) {
 		ID:          1,
 		Tags:        "lopatka, kolpa, nikola",
 		URL:         "https://portfolio_you/&lopata/6",
-		CreaterName: "faner201",
+		CreaterName: user.Username,
 		Name:        "backend",
 		Photo:       "D/photo/lop.png",
 		Text:        "hahahahhahah text",
 	}
 
-	portfolioNotCreateName := &models.Portfolio{
+	portfolioNotName := &models.Portfolio{
 		ID:          1,
 		Tags:        "lopatka, kolpa, nikola",
 		URL:         "https://portfolio_you/&lopata/6",
-		CreaterName: "faner201",
+		CreaterName: user.Username,
 		Name:        "",
 		Photo:       "D/photo/lop.png",
 		Text:        "hahahahhahah text",
 	}
 
-	err := p.CreatePortfolio(context.Background(), portfolio, user)
+	menu := &models.Menu{
+		ID:          1,
+		Name:        "backend",
+		CreaterName: user.Username,
+		ShortText:   "deceided",
+	}
+
+	err := p.CreatePortfolio(context.Background(), portfolio, user, menu)
 	assert.NoError(t, err)
 
-	err = p.CreatePortfolio(context.Background(), portfolioNotCreateName, user)
+	err = p.CreatePortfolio(context.Background(), portfolioNotName, user, menu)
 	assert.Error(t, err)
 	assert.Equal(t, err, portfolios.ErrCreatePortfolio)
 }
@@ -57,21 +64,29 @@ func TestGetListPortfolioByUserName(t *testing.T) {
 		Email:    "polta@mail.ru",
 	}
 
-	for i := 0; i < 10; i++ {
-		portfolio := &models.Portfolio{
-			ID:          i + 1,
-			Tags:        "lopatka, kolpa, nikola",
-			URL:         "https://portfolio_you/&lopata/6",
-			CreaterName: "faner201",
-			Name:        "backend",
-			Photo:       "D/photo/lop.png",
-			Text:        "hahahahhahah text",
-		}
-
-		p.CreatePortfolio(context.Background(), portfolio, user)
+	portfolio := &models.Portfolio{
+		ID:          1,
+		Tags:        "lopatka, kolpa, nikola",
+		URL:         "https://portfolio_you/&lopata/6",
+		CreaterName: user.Username,
+		Name:        "backend",
+		Photo:       "D/photo/lop.png",
+		Text:        "hahahahhahah text",
 	}
 
-	returnedPortfolio, err := p.GetListPortfolioByUserName(context.Background(), "faner201")
+	for i := 0; i < 10; i++ {
+
+		menu := &models.Menu{
+			ID:          i + 1,
+			Name:        "backend",
+			CreaterName: user.Username,
+			ShortText:   "deceided",
+		}
+
+		p.CreatePortfolio(context.Background(), portfolio, user, menu)
+	}
+
+	returnedPortfolio, err := p.GetListPortfolioByUserName(context.Background(), user.Username)
 	assert.NoError(t, err)
 	assert.Equal(t, 10, len(returnedPortfolio))
 
@@ -101,7 +116,14 @@ func TestGetPortfolioByUserName(t *testing.T) {
 		Email:    "polta@mail.ru",
 	}
 
-	p.CreatePortfolio(context.Background(), portfolio, user)
+	menu := &models.Menu{
+		ID:          1,
+		Name:        "backend",
+		CreaterName: user.Username,
+		ShortText:   "deceided",
+	}
+
+	p.CreatePortfolio(context.Background(), portfolio, user, menu)
 
 	returnedPortfolio, err := p.GetPortfolioByUserName(context.Background(), "faner201", 1)
 	assert.NoError(t, err)
