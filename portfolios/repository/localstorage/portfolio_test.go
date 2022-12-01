@@ -132,5 +132,41 @@ func TestGetPortfolioByUserName(t *testing.T) {
 	returnedPortfolio, err = p.GetPortfolioByUserName(context.Background(), "", 1)
 	assert.Error(t, err)
 	assert.Equal(t, err, portfolios.ErrGetPortfolioByUserName)
+}
 
+func TestDeletePortfolio(t *testing.T) {
+	p := NewPortfolioLocalStorage()
+
+	portfolio := &models.Portfolio{
+		ID:          1,
+		Tags:        "lopatka, kolpa, nikola",
+		URL:         "https://portfolio_you/&lopata/6",
+		CreaterName: "faner201",
+		Name:        "backend",
+		Photo:       "D/photo/lop.png",
+		Text:        "hahahahhahah text",
+	}
+
+	user := &models.User{
+		ID:       1,
+		Username: "faner201",
+		Password: "locaut",
+		Email:    "polta@mail.ru",
+	}
+
+	menu := &models.Menu{
+		ID:          1,
+		Name:        "backend",
+		CreaterName: user.Username,
+		ShortText:   "deceided",
+	}
+
+	p.CreatePortfolio(context.Background(), portfolio, user, menu)
+
+	err := p.DeletePortfolio(context.Background(), user, portfolio.ID)
+	assert.NoError(t, err)
+
+	err = p.DeletePortfolio(context.Background(), user, 5)
+	assert.Error(t, err)
+	assert.Equal(t, err, portfolios.ErrDeletePortfolio)
 }

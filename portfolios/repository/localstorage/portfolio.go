@@ -65,3 +65,16 @@ func (p *portfolioLocalStorage) GetListPortfolioByUserName(ctx context.Context, 
 
 	return menus, nil
 }
+
+func (p *portfolioLocalStorage) DeletePortfolio(ctx context.Context, user *models.User, portfolioID int) error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	pf, ex := p.portf[portfolioID]
+	if ex && pf.CreaterName == user.Username {
+		delete(p.portf, portfolioID)
+		return nil
+	}
+
+	return portfolios.ErrDeletePortfolio
+}
