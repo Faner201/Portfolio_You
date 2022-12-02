@@ -28,3 +28,9 @@ func (m *portfolioMock) GetListPortfolioByUserName(ctx context.Context, userName
 
 	return args.Get(0).([]*models.Portfolio), args.Error(1)
 }
+
+func (m *portfolioMock) DeletePortfolio(ctx context.Context, user *models.User, portportfolioID int) error {
+	args := m.Called(user, portportfolioID)
+
+	return args.Error(0)
+}

@@ -5,4 +5,5 @@ type Menu struct {
 	Name        string
 	CreaterName string
 	ShortText   string
+	Photo       string
 }
