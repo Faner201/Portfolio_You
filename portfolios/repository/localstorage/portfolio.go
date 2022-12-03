@@ -7,21 +7,21 @@ import (
 	"sync"
 )
 
-type portfolioLocalStorage struct {
+type PortfolioLocalStorage struct {
 	portf map[int]*models.Portfolio
 	menus map[int]*models.Menu
 	mutex *sync.Mutex
 }
 
-func NewPortfolioLocalStorage() *portfolioLocalStorage {
-	return &portfolioLocalStorage{
+func NewPortfolioLocalStorage() *PortfolioLocalStorage {
+	return &PortfolioLocalStorage{
 		portf: make(map[int]*models.Portfolio),
 		menus: make(map[int]*models.Menu),
 		mutex: new(sync.Mutex),
 	}
 }
 
-func (p *portfolioLocalStorage) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio, user *models.User, menu *models.Menu) error {
+func (p *PortfolioLocalStorage) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio, user *models.User, menu *models.Menu) error {
 	portfolio.CreaterName = user.Username
 	menu.CreaterName = user.Username
 
@@ -36,7 +36,7 @@ func (p *portfolioLocalStorage) CreatePortfolio(ctx context.Context, portfolio *
 	return portfolios.ErrCreatePortfolio
 }
 
-func (p *portfolioLocalStorage) GetPortfolioByUserName(ctx context.Context, userName string, portfolioID int) (*models.Portfolio, error) {
+func (p *PortfolioLocalStorage) GetPortfolioByUserName(ctx context.Context, userName string, portfolioID int) (*models.Portfolio, error) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
@@ -49,7 +49,7 @@ func (p *portfolioLocalStorage) GetPortfolioByUserName(ctx context.Context, user
 	return nil, portfolios.ErrGetPortfolioByUserName
 }
 
-func (p *portfolioLocalStorage) GetListPortfolioByUserName(ctx context.Context, userName string) ([]*models.Menu, error) {
+func (p *PortfolioLocalStorage) GetListPortfolioByUserName(ctx context.Context, userName string) ([]*models.Menu, error) {
 	menus := make([]*models.Menu, 0)
 
 	p.mutex.Lock()
@@ -66,7 +66,7 @@ func (p *portfolioLocalStorage) GetListPortfolioByUserName(ctx context.Context, 
 	return menus, nil
 }
 
-func (p *portfolioLocalStorage) DeletePortfolio(ctx context.Context, user *models.User, portfolioID int) error {
+func (p *PortfolioLocalStorage) DeletePortfolio(ctx context.Context, user *models.User, portfolioID int) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
