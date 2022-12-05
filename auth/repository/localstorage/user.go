@@ -8,13 +8,13 @@ import (
 )
 
 type UserLocalStorage struct {
-	users map[int]*models.User
+	users map[string]*models.User
 	mutex *sync.Mutex
 }
 
 func NewUserLocalStorage() *UserLocalStorage {
 	return &UserLocalStorage{
-		users: make(map[int]*models.User),
+		users: make(map[string]*models.User),
 		mutex: new(sync.Mutex),
 	}
 }

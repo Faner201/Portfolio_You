@@ -13,7 +13,7 @@ func TestCreateUser(t *testing.T) {
 	u := NewUserLocalStorage()
 
 	user := &models.User{
-		ID:       1,
+		ID:       "1",
 		Username: "faner201",
 		Password: "locaut",
 		Email:    "polta@mail.ru",
@@ -23,7 +23,7 @@ func TestCreateUser(t *testing.T) {
 	assert.NoError(t, err)
 
 	userNotUsername := &models.User{
-		ID:       1,
+		ID:       "1",
 		Username: "",
 		Password: "locaut",
 		Email:    "polta@mail.ru",
@@ -38,7 +38,7 @@ func TestGetUser(t *testing.T) {
 	u := NewUserLocalStorage()
 
 	user := &models.User{
-		ID:       1,
+		ID:       "1",
 		Username: "faner201",
 		Password: "locaut",
 		Email:    "polta@mail.ru",
