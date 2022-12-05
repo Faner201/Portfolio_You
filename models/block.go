@@ -1,9 +1,9 @@
 package models
 
-type Block_photo struct {
+type BlockPhoto struct {
 	Photo string
 }
 
-type Block_text struct {
+type BlockText struct {
 	Text string
 }

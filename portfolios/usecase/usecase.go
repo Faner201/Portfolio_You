@@ -27,16 +27,24 @@ func CreateURL(name, createrName string) string {
 	return url.String()
 }
 
-func (p PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, url, tags, name, text, photo, shortText string) error {
+func (p PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, name, view, bg string, structs []interface{}) error {
 	portf := &models.Portfolio{
-		Tags:        tags,
-		URL:         CreateURL(name, user.Username),
-		CreaterName: user.Username,
-		Name:        name,
-		Photo:       photo,
-		Text:        text,
+		Url:         CreateURL(name, user.Username),
+		CreaterUser: user.Username,
+		Global: models.Global{
+			Name: name,
+			View: view,
+			Bg:   bg,
+		},
+		Struct: models.Struct{
+			StructList: structs,
+		},
 	}
 
+	return p.portfolioRepo.CreatePortfolio(context.Background(), portf, user)
+}
+
+func (p PortfolioUseCase) CreateMenuPortfolio(ctx context.Context, user *models.User, name, shortText, photo string) error {
 	menu := &models.Menu{
 		Name:        name,
 		CreaterName: user.Username,
@@ -44,10 +52,10 @@ func (p PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User
 		Photo:       photo,
 	}
 
-	return p.portfolioRepo.CreatePortfolio(context.Background(), portf, user, menu)
+	return p.portfolioRepo.CreateMenuPortfolio(context.Background(), user, menu)
 }
 
-func (p PortfolioUseCase) OpenPortfolio(ctx context.Context, user *models.User, portfolioID int) (*models.Portfolio, error) {
+func (p PortfolioUseCase) OpenPortfolio(ctx context.Context, user *models.User, portfolioID string) (*models.Portfolio, error) {
 	return p.portfolioRepo.GetPortfolioByUserName(context.Background(), user.Username, portfolioID)
 }
 
@@ -55,6 +63,6 @@ func (p PortfolioUseCase) GetListPorfolio(ctx context.Context, user *models.User
 	return p.portfolioRepo.GetListPortfolioByUserName(context.Background(), user.Username)
 }
 
-func (p PortfolioUseCase) DeletePortfolio(ctx context.Context, user *models.User, portfolioID int) error {
+func (p PortfolioUseCase) DeletePortfolio(ctx context.Context, user *models.User, portfolioID string) error {
 	return p.portfolioRepo.DeletePortfolio(context.Background(), user, portfolioID)
 }

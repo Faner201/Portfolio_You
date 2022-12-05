@@ -1,8 +1,9 @@
 package models
 
 type Portfolio struct {
-	ID  string
-	Url string
+	ID          string
+	Url         string
+	CreaterUser string
 	Global
 	Struct
 }
