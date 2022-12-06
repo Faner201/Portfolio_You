@@ -6,7 +6,7 @@ import (
 )
 
 type UseCase interface {
-	CreatePortfolio(ctx context.Context, user *models.User, name, view, bg, shortText, photo string, structs []interface{}) error
+	CreatePortfolio(ctx context.Context, user *models.User, name, view, bg string, structs []interface{}) error
 	CreateMenuPortfolio(ctx context.Context, user *models.User, name, shortText, photo string) error
 	OpenPortfolio(ctx context.Context, user *models.User, portfolioID string) (*models.Portfolio, error)
 	GetListPorfolio(ctx context.Context, user *models.User) ([]*models.Menu, error)

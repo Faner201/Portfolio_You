@@ -46,8 +46,6 @@ func (a *AuthUseCase) SignUp(ctx context.Context, username, password, email stri
 	return a.userRepo.CreateUser(ctx, user)
 }
 
-// MAGIC XD
-
 func (a *AuthUseCase) ParseToketJWT(ctx context.Context, accessToken string) (*models.User, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &AuthClaims{},
 		func(token *jwt.Token) (interface{}, error) {

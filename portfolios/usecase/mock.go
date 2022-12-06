@@ -11,7 +11,7 @@ type PortfolioUseCaseMock struct {
 	mock.Mock
 }
 
-func (m *PortfolioUseCaseMock) CreatePortfolio(ctx context.Context, user *models.User, name, view, bg, shortText, photo string, structs []interface{}) error {
+func (m *PortfolioUseCaseMock) CreatePortfolio(ctx context.Context, user *models.User, name, view, bg string, structs []interface{}) error {
 	args := m.Called(user, name, view, bg, structs)
 
 	return args.Error(0)

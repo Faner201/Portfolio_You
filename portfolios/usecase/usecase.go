@@ -27,7 +27,7 @@ func CreateURL(name, createrName string) string {
 	return url.String()
 }
 
-func (p PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, name, view, bg string, structs []interface{}) error {
+func (p *PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, name, view, bg string, structs []interface{}) error {
 	portf := &models.Portfolio{
 		Url:         CreateURL(name, user.Username),
 		CreaterUser: user.Username,
@@ -41,7 +41,7 @@ func (p PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User
 		},
 	}
 
-	return p.portfolioRepo.CreatePortfolio(context.Background(), portf, user)
+	return p.portfolioRepo.CreatePortfolio(ctx, portf, user)
 }
 
 func (p PortfolioUseCase) CreateMenuPortfolio(ctx context.Context, user *models.User, name, shortText, photo string) error {
@@ -52,17 +52,17 @@ func (p PortfolioUseCase) CreateMenuPortfolio(ctx context.Context, user *models.
 		Photo:       photo,
 	}
 
-	return p.portfolioRepo.CreateMenuPortfolio(context.Background(), user, menu)
+	return p.portfolioRepo.CreateMenuPortfolio(ctx, user, menu)
 }
 
 func (p PortfolioUseCase) OpenPortfolio(ctx context.Context, user *models.User, portfolioID string) (*models.Portfolio, error) {
-	return p.portfolioRepo.GetPortfolioByUserName(context.Background(), user.Username, portfolioID)
+	return p.portfolioRepo.GetPortfolioByUserName(ctx, user.Username, portfolioID)
 }
 
 func (p PortfolioUseCase) GetListPorfolio(ctx context.Context, user *models.User) ([]*models.Menu, error) {
-	return p.portfolioRepo.GetListPortfolioByUserName(context.Background(), user.Username)
+	return p.portfolioRepo.GetListPortfolioByUserName(ctx, user.Username)
 }
 
 func (p PortfolioUseCase) DeletePortfolio(ctx context.Context, user *models.User, portfolioID string) error {
-	return p.portfolioRepo.DeletePortfolio(context.Background(), user, portfolioID)
+	return p.portfolioRepo.DeletePortfolio(ctx, user, portfolioID)
 }
