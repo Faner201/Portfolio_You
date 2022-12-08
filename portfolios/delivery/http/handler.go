@@ -13,8 +13,8 @@ type Portfolio struct {
 	ID          string        `json:"id"`
 	URL         string        `json:"url"`
 	CreaterUser string        `json:"createrUser"`
-	Global      models.Global `json:"Global"`
-	Struct      models.Struct `json:"Struct"`
+	Global      models.Global `json:"global"`
+	Struct      models.Struct `json:"struct"`
 }
 
 type Menu struct {
@@ -36,10 +36,16 @@ func NewHandler(useCase portfolios.UseCase) *Handler {
 }
 
 type createInputPortf struct {
-	URL         string        `json:"url"`
-	CreaterUser string        `json:"createrUser"`
-	Global      models.Global `json:"Global"`
-	Struct      models.Struct `json:"Struct"`
+	URL         string `json:"url"`
+	CreaterUser string `json:"createrUser"`
+	Global      struct {
+		Name string `json:"name"`
+		View string `json:"view"`
+		Bg   string `json:"bg"`
+	} `json:"Global"`
+	Struct struct {
+		StructList []interface{} `json:"structList"`
+	} `json:"struct"`
 }
 
 type createInputMenu struct {
@@ -157,3 +163,12 @@ func toPortfolio(p *models.Portfolio) *Portfolio {
 		Struct:      p.Struct,
 	}
 }
+
+// struct {
+// 	Name string `json:"name"`
+// 	View string `json:"view"`
+// 	Bg   string `json:"bg"`
+// } `json:"Global"`
+// Struct struct {
+// 	StructList []interface{} `json:"structList"`
+// } `json:"struct"`
