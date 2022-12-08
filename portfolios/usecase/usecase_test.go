@@ -9,11 +9,44 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func User(name, email, password string) *models.User {
+	return &models.User{
+		Username: name,
+		Password: password,
+		Email:    email,
+	}
+}
+
+func Portfolio(name, view, bg, url, createUser string, structs []interface{}) *models.Portfolio {
+	return &models.Portfolio{
+		Url:         url,
+		CreaterUser: createUser,
+		Global: models.Global{
+			Name: name,
+			View: view,
+			Bg:   bg,
+		},
+		Struct: models.Struct{
+			StructList: structs,
+		},
+	}
+}
+
+func Menu(name, createrName, shortText, photo string) *models.Menu {
+	return &models.Menu{
+		Name:        name,
+		CreaterName: createrName,
+		ShortText:   shortText,
+		Photo:       photo,
+	}
+}
+
 func TestCreatePortfolio(t *testing.T) {
 	rep := new(mock.PortfolioMock)
 
 	pf := NewPortfolioUseCase(rep)
 
+	url := "https://portfolio_you.com/portfolio/lopata%25faner201"
 	name := "lopata"
 	view := "very good, polka"
 	bg := "very interesting"
@@ -28,25 +61,12 @@ func TestCreatePortfolio(t *testing.T) {
 		},
 	}
 
-	user := &models.User{
-		ID:       "1",
-		Username: "faner201",
-		Password: "locaut",
-		Email:    "polta@mail.ru",
-	}
+	username := "faner201"
+	password := "locaut"
+	email := "polta@mail.ru"
 
-	portfolio := &models.Portfolio{
-		Url:         "https://portfolio_you.com/portfolio/lopata%25faner201",
-		CreaterUser: user.Username,
-		Global: models.Global{
-			Name: name,
-			View: view,
-			Bg:   bg,
-		},
-		Struct: models.Struct{
-			StructList: structs,
-		},
-	}
+	user := User(username, email, password)
+	portfolio := Portfolio(name, view, bg, url, user.Username, structs)
 
 	rep.On("CreatePortfolio", portfolio, user).Return(nil)
 	err := pf.CreatePortfolio(context.Background(), user, name, view, bg, structs)
@@ -58,25 +78,18 @@ func TestCreateMenuPortfoli0(t *testing.T) {
 
 	pf := NewPortfolioUseCase(rep)
 
-	user := &models.User{
-		Username: "faner201",
-		Password: "locaut",
-		Email:    "polta@mail.ru",
-	}
+	username := "faner201"
+	password := "locaut"
+	email := "polta@mail.ru"
 
 	name := "Lopata"
 	shortText := "lol"
 	photo := "cd/fdsfewtrwfsd"
 
-	menu := &models.Menu{
-		Name:        name,
-		CreaterName: user.Username,
-		ShortText:   shortText,
-		Photo:       photo,
-	}
-
+	user := User(username, email, password)
+	menu := Menu(name, user.Username, shortText, photo)
 	rep.On("CreateMenuPortfolio", user, menu).Return(nil)
-	err := pf.CreateMenuPortfolio(context.Background(), user, name, shortText, photo)
+	err := pf.CreateMenuPortfolio(context.Background(), user, menu.Name, menu.ShortText, menu.Photo)
 	assert.NoError(t, err)
 }
 
@@ -85,18 +98,12 @@ func TestOpenPortfolio(t *testing.T) {
 
 	pf := NewPortfolioUseCase(rep)
 
-	userName := "faner201"
+	username := "faner201"
 	email := "polta@mail.ru"
 	password := "locaut"
 
 	portfolioID := "1"
-
-	user := &models.User{
-		Username: userName,
-		Email:    email,
-		Password: password,
-	}
-
+	url := "https://portfolio_you.com/portfolio/lopata%25faner201"
 	name := "lopata"
 	view := "very good, polka"
 	bg := "very interesting"
@@ -111,21 +118,10 @@ func TestOpenPortfolio(t *testing.T) {
 		},
 	}
 
-	portfolio := &models.Portfolio{
-		ID:          portfolioID,
-		Url:         "https://portfolio_you.com/portfolio/lopata%25faner201",
-		CreaterUser: user.Username,
-		Global: models.Global{
-			Name: name,
-			View: view,
-			Bg:   bg,
-		},
-		Struct: models.Struct{
-			StructList: structs,
-		},
-	}
+	user := User(username, email, password)
+	portfolio := Portfolio(name, view, bg, url, user.Username, structs)
 
-	rep.On("GetPortfolioByUserName", userName, portfolioID).Return(portfolio, nil)
+	rep.On("GetPortfolioByUserName", username, portfolioID).Return(portfolio, nil)
 	portf, err := pf.OpenPortfolio(context.Background(), user, portfolioID)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, portf)
@@ -136,38 +132,22 @@ func TestGetListPortfolio(t *testing.T) {
 
 	pf := NewPortfolioUseCase(rep)
 
-	userName := "faner201"
+	username := "faner201"
 	email := "polta@mail.ru"
 	password := "locaut"
-
-	user := &models.User{
-		Username: userName,
-		Email:    email,
-		Password: password,
-	}
 
 	name := "Lopata"
 	shortText := "lol"
 	photo := "cd/fdsfewtrwfsd"
 
+	user := User(username, email, password)
+
 	menuList := []*models.Menu{
-		&models.Menu{
-			Name:      name,
-			ShortText: shortText,
-			Photo:     photo,
-		},
-		&models.Menu{
-			Name:      name,
-			ShortText: shortText,
-			Photo:     photo,
-		},
-		&models.Menu{
-			Name:      name,
-			ShortText: shortText,
-			Photo:     photo,
-		},
+		Menu(name, user.Username, shortText, photo),
+		Menu(name, user.Username, shortText, photo),
+		Menu(name, user.Username, shortText, photo),
 	}
-	rep.On("GetListPortfolioByUserName", userName).Return(menuList, nil)
+	rep.On("GetListPortfolioByUserName", username).Return(menuList, nil)
 	list, err := pf.GetListPorfolio(context.Background(), user)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, list)
@@ -178,17 +158,13 @@ func TestDeletePortfolio(t *testing.T) {
 
 	pf := NewPortfolioUseCase(rep)
 
-	userName := "faner201"
+	username := "faner201"
 	email := "polta@mail.ru"
 	password := "locaut"
 
 	portfolioID := "1"
 
-	user := &models.User{
-		Username: userName,
-		Email:    email,
-		Password: password,
-	}
+	user := User(username, email, password)
 
 	rep.On("DeletePortfolio", user, portfolioID).Return(nil)
 	err := pf.DeletePortfolio(context.Background(), user, portfolioID)
