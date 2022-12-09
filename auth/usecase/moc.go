@@ -17,7 +17,7 @@ func (m *AuthUseCaseMock) SignUp(ctx context.Context, username, password, email 
 	return args.Error(0)
 }
 
-func (m *AuthUseCaseMock) ParseToketJWT(ctx context.Context, accessToken string) (*models.User, error) {
+func (m *AuthUseCaseMock) ParseTokenJWT(ctx context.Context, accessToken string) (*models.User, error) {
 	args := m.Called(accessToken)
 
 	return args.Get(0).(*models.User), args.Error(1)

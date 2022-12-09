@@ -66,7 +66,7 @@ func TestParseToken(t *testing.T) {
 
 	rep.On("GetUser", user.Username, user.Password).Return(user, nil)
 	token, _ := uc.SignIn(context.Background(), username, password)
-	parsedUser, err := uc.ParseToketJWT(context.Background(), token)
+	parsedUser, err := uc.ParseTokenJWT(context.Background(), token)
 	assert.NoError(t, err)
 	assert.Equal(t, user, parsedUser)
 }
