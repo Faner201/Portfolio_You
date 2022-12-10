@@ -4,7 +4,6 @@ import (
 	"Portfolio_You/models"
 	"Portfolio_You/portfolios"
 	"context"
-	"net/url"
 )
 
 type PortfolioUseCase struct {
@@ -18,13 +17,8 @@ func NewPortfolioUseCase(portfolioRepo portfolios.PortfolioRepository) *Portfoli
 }
 
 func CreateURL(name, createrName string) string {
-	url := url.URL{
-		Scheme: "https",
-		Host:   "portfolio_you.com",
-		Path:   "/portfolio/" + name + "%" + createrName,
-	}
-
-	return url.String()
+	url := "/portfolio/" + name + "%" + createrName
+	return url
 }
 
 func (p *PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, name, view, bg string, structs []interface{}) error {

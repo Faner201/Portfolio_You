@@ -46,7 +46,7 @@ func TestCreatePortfolio(t *testing.T) {
 
 	pf := NewPortfolioUseCase(rep)
 
-	url := "https://portfolio_you.com/portfolio/lopata%25faner201"
+	url := "/portfolio/lopata%faner201"
 	name := "lopata"
 	view := "very good, polka"
 	bg := "very interesting"
@@ -103,7 +103,7 @@ func TestOpenPortfolio(t *testing.T) {
 	password := "locaut"
 
 	portfolioID := "1"
-	url := "https://portfolio_you.com/portfolio/lopata%25faner201"
+	url := "/portfolio/lopata%faner201"
 	name := "lopata"
 	view := "very good, polka"
 	bg := "very interesting"
