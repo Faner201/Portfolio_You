@@ -1,9 +1,6 @@
 package models
 
-type BlockPhoto struct {
-	Photo string
-}
-
-type BlockText struct {
-	Text string
+type Block struct {
+	Type     string
+	Location string
 }

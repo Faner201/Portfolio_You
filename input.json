@@ -1,0 +1,63 @@
+"Portfolio" : {
+    "ID" : "1",
+    "Url" : "/portfolios/aboba&faner201",
+    "CreaterUser" : "faner201",
+    "Name" : "aboba",
+    "Text" : {
+		{
+			"Sludge" : "avtobot",
+			"Style" :  "limitic",
+			"Size" :   "12",
+		},
+		{
+			"Sludge" : "avtobot",
+			"Style" :  "limitic",
+			"Size" :   "12",
+	    },
+    }
+    "Photo" : {
+		{
+			"Addres" : "cd/42342dsfs3",
+		},
+		{
+			"Addres" : "cd/42342dsfs3",
+		},
+    },
+    "Colors" : {
+		"Base" :      "#fff",
+		"Text" :      "#dsfsdfs",
+		"Contrast" :  "#fdsfsdcxs",
+		"Primary" :   "#fdsfsdf",
+		"Secondary" : "#fdsfxz",
+	},
+    "Structs" : {
+		{
+			{
+				"Type" :     "text",
+				"Location" : "1",
+			},
+			{
+				"Type" :     "text",
+				"Location" : "2",
+			},
+			{
+				"Type" :     "image",
+				"Location" : "1",
+			},
+		},
+		{
+			{
+				"Type" :     "image",
+				"Location" : "2",
+			},
+			{
+				"Type" :     "text",
+				"Location" : "3",
+			},
+			{
+				"Type" :     "text",
+				"Location" : "4",
+			},
+		},
+	}
+}

@@ -26,7 +26,8 @@ func (p *PortfolioLocalStorage) CreatePortfolio(ctx context.Context, portfolio *
 
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
-	if portfolio.Global.Bg != "" && portfolio.Global.Name != "" && portfolio.Global.View != "" && portfolio.Struct.StructList != nil {
+	if portfolio.Name != "" && portfolio.Struct != nil && portfolio.Photo != nil &&
+		portfolio.Text != nil && portfolio.Url != "" && portfolio.CreaterUser != "" {
 		p.portf[portfolio.ID] = portfolio
 		return nil
 	}

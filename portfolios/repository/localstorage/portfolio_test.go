@@ -10,59 +10,102 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func User(id, username, password, email string) *models.User {
+	return &models.User{
+		ID:       id,
+		Username: username,
+		Password: password,
+		Email:    email,
+	}
+}
+
+func Portfolio(id, url, createrUser, name string, text *[]models.Text, photo *[]models.Photo, colors *models.Colors,
+	structs *[][]models.Block) *models.Portfolio {
+	return &models.Portfolio{
+		ID:          id,
+		Url:         url,
+		CreaterUser: createrUser,
+		Name:        name,
+		Text:        text,
+		Photo:       photo,
+		Colors:      colors,
+		Struct:      structs,
+	}
+}
+
+func Menu(id, name, createrUser, shortText string) *models.Menu {
+	return &models.Menu{
+		ID:          id,
+		CreaterName: createrUser,
+		Name:        name,
+		ShortText:   shortText,
+	}
+}
+
 func TestCreatePortfolio(t *testing.T) {
 	p := NewPortfolioLocalStorage()
 
-	user := &models.User{
-		ID:       "1",
-		Username: "faner201",
-		Password: "locaut",
-		Email:    "polta@mail.ru",
+	id := "1"
+	username := "faner201"
+	password := "locaut"
+	email := "polta@mail.ru"
+
+	user := User(id, username, password, email)
+
+	url := "/portfolios/aboba&faner201"
+	createrUser := user.Username
+	name := "aboba"
+	notName := ""
+	text := &[]models.Text{}
+	photo := &[]models.Photo{
+		{
+			Addres: "cd/42342dsfs3",
+		},
+		{
+			Addres: "cd/42342dsfs3",
+		},
+	}
+	colors := &models.Colors{
+		Base:      "#fff",
+		Text:      "#dsfsdfs",
+		Contrast:  "#fdsfsdcxs",
+		Primary:   "#fdsfsdf",
+		Secondary: "#fdsfxz",
 	}
 
-	portfolio := &models.Portfolio{
-		ID:          "1",
-		Url:         "https://portfolio_you/&lopata/6",
-		CreaterUser: user.Username,
-		Global: models.Global{
-			Name: "Very best",
-			View: "nice, popit",
-			Bg:   "not nice, impossible",
+	structs := &[][]models.Block{
+		{
+			{
+				Type:     "text",
+				Location: "1",
+			},
+			{
+				Type:     "text",
+				Location: "2",
+			},
+			{
+				Type:     "image",
+				Location: "1",
+			},
 		},
-		Struct: models.Struct{
-			StructList: []interface{}{
-				models.BlockPhoto{
-					Photo: "cd:/fdsfsdfsd",
-				}, models.BlockPhoto{
-					Photo: "cd:/fdsfwerwefds",
-				}, models.BlockText{
-					Text: "Very impoaible",
-				},
+		{
+			{
+				Type:     "image",
+				Location: "2",
+			},
+			{
+				Type:     "text",
+				Location: "3",
+			},
+			{
+				Type:     "text",
+				Location: "4",
 			},
 		},
 	}
 
-	portfolioNotName := &models.Portfolio{
-		ID:          "1",
-		Url:         "https://portfolio_you/&lopata/6",
-		CreaterUser: user.Username,
-		Global: models.Global{
-			Name: "",
-			View: "nice, popit",
-			Bg:   "not nice, impossible",
-		},
-		Struct: models.Struct{
-			StructList: []interface{}{
-				models.BlockPhoto{
-					Photo: "cd:/fdsfsdfsd",
-				}, models.BlockPhoto{
-					Photo: "cd:/fdsfwerwefds",
-				}, models.BlockText{
-					Text: "Very impoaible",
-				},
-			},
-		},
-	}
+	portfolio := Portfolio(id, url, createrUser, name, text, photo, colors, structs)
+	portfolioNotName := Portfolio(id, url, createrUser, notName, text, photo, colors, structs)
 
 	err := p.CreatePortfolio(context.Background(), portfolio, user)
 	assert.NoError(t, err)
@@ -75,26 +118,20 @@ func TestCreatePortfolio(t *testing.T) {
 func TestCreateMenuPortfolio(t *testing.T) {
 	p := NewPortfolioLocalStorage()
 
-	user := &models.User{
-		ID:       "1",
-		Username: "faner201",
-		Password: "locaut",
-		Email:    "polta@mail.ru",
-	}
+	id := "1"
+	username := "faner201"
+	password := "locaut"
+	email := "polta@mail.ru"
 
-	menu := &models.Menu{
-		ID:          "1",
-		Name:        "backend",
-		CreaterName: user.Username,
-		ShortText:   "deceided",
-	}
+	user := User(id, username, password, email)
 
-	menuNotName := &models.Menu{
-		ID:          "1",
-		Name:        "",
-		CreaterName: user.Username,
-		ShortText:   "deceided",
-	}
+	name := "backend"
+	notName := ""
+	createrName := user.Username
+	shortText := "deceided"
+
+	menu := Menu(id, name, createrName, shortText)
+	menuNotName := Menu(id, notName, createrName, shortText)
 
 	err := p.CreateMenuPortfolio(context.Background(), user, menu)
 	assert.NoError(t, err)
@@ -107,43 +144,82 @@ func TestCreateMenuPortfolio(t *testing.T) {
 func TestGetListPortfolioByUserName(t *testing.T) {
 	p := NewPortfolioLocalStorage()
 
-	user := &models.User{
-		ID:       "1",
-		Username: "faner201",
-		Password: "locaut",
-		Email:    "polta@mail.ru",
+	id := "1"
+	username := "faner201"
+	password := "locaut"
+	email := "polta@mail.ru"
+
+	user := User(id, username, password, email)
+
+	shortText := "deceided"
+
+	url := "/portfolios/aboba&faner201"
+	createrUser := user.Username
+	name := "aboba"
+	text := &[]models.Text{
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+	}
+	photo := &[]models.Photo{
+		{
+			Addres: "cd/42342dsfs3",
+		},
+		{
+			Addres: "cd/42342dsfs3",
+		},
+	}
+	colors := &models.Colors{
+		Base:      "#fff",
+		Text:      "#dsfsdfs",
+		Contrast:  "#fdsfsdcxs",
+		Primary:   "#fdsfsdf",
+		Secondary: "#fdsfxz",
 	}
 
-	portfolio := &models.Portfolio{
-		ID:          "1",
-		Url:         "https://portfolio_you/&lopata/6",
-		CreaterUser: user.Username,
-		Global: models.Global{
-			Name: "Very best",
-			View: "nice, popit",
-			Bg:   "not nice, impossible",
+	structs := &[][]models.Block{
+		{
+			{
+				Type:     "text",
+				Location: "1",
+			},
+			{
+				Type:     "text",
+				Location: "2",
+			},
+			{
+				Type:     "image",
+				Location: "1",
+			},
 		},
-		Struct: models.Struct{
-			StructList: []interface{}{
-				models.BlockPhoto{
-					Photo: "cd:/fdsfsdfsd",
-				}, models.BlockPhoto{
-					Photo: "cd:/fdsfwerwefds",
-				}, models.BlockText{
-					Text: "Very impoaible",
-				},
+		{
+			{
+				Type:     "image",
+				Location: "2",
+			},
+			{
+				Type:     "text",
+				Location: "3",
+			},
+			{
+				Type:     "text",
+				Location: "4",
 			},
 		},
 	}
 
+	portfolio := Portfolio(id, url, createrUser, name, text, photo, colors, structs)
+
 	for i := 0; i < 10; i++ {
 
-		menu := &models.Menu{
-			ID:          fmt.Sprintf("id%d", i),
-			Name:        "backend",
-			CreaterName: user.Username,
-			ShortText:   "deceided",
-		}
+		menu := Menu(fmt.Sprintf("id%d", i), name, createrUser, shortText)
 
 		p.CreatePortfolio(context.Background(), portfolio, user)
 		p.CreateMenuPortfolio(context.Background(), user, menu)
@@ -162,34 +238,76 @@ func TestGetListPortfolioByUserName(t *testing.T) {
 func TestGetPortfolioByUserName(t *testing.T) {
 	p := NewPortfolioLocalStorage()
 
-	user := &models.User{
-		ID:       "1",
-		Username: "faner201",
-		Password: "locaut",
-		Email:    "polta@mail.ru",
+	id := "1"
+	username := "faner201"
+	password := "locaut"
+	email := "polta@mail.ru"
+
+	user := User(id, username, password, email)
+
+	url := "/portfolios/aboba&faner201"
+	createrUser := user.Username
+	name := "aboba"
+	text := &[]models.Text{
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+	}
+	photo := &[]models.Photo{
+		{
+			Addres: "cd/42342dsfs3",
+		},
+		{
+			Addres: "cd/42342dsfs3",
+		},
+	}
+	colors := &models.Colors{
+		Base:      "#fff",
+		Text:      "#dsfsdfs",
+		Contrast:  "#fdsfsdcxs",
+		Primary:   "#fdsfsdf",
+		Secondary: "#fdsfxz",
 	}
 
-	portfolio := &models.Portfolio{
-		ID:          "1",
-		Url:         "https://portfolio_you/&lopata/6",
-		CreaterUser: user.Username,
-		Global: models.Global{
-			Name: "Very best",
-			View: "nice, popit",
-			Bg:   "not nice, impossible",
+	structs := &[][]models.Block{
+		{
+			{
+				Type:     "text",
+				Location: "1",
+			},
+			{
+				Type:     "text",
+				Location: "2",
+			},
+			{
+				Type:     "image",
+				Location: "1",
+			},
 		},
-		Struct: models.Struct{
-			StructList: []interface{}{
-				models.BlockPhoto{
-					Photo: "cd:/fdsfsdfsd",
-				}, models.BlockPhoto{
-					Photo: "cd:/fdsfwerwefds",
-				}, models.BlockText{
-					Text: "Very impoaible",
-				},
+		{
+			{
+				Type:     "image",
+				Location: "2",
+			},
+			{
+				Type:     "text",
+				Location: "3",
+			},
+			{
+				Type:     "text",
+				Location: "4",
 			},
 		},
 	}
+
+	portfolio := Portfolio(id, url, createrUser, name, text, photo, colors, structs)
 
 	p.CreatePortfolio(context.Background(), portfolio, user)
 
@@ -205,34 +323,76 @@ func TestGetPortfolioByUserName(t *testing.T) {
 func TestDeletePortfolio(t *testing.T) {
 	p := NewPortfolioLocalStorage()
 
-	user := &models.User{
-		ID:       "1",
-		Username: "faner201",
-		Password: "locaut",
-		Email:    "polta@mail.ru",
+	id := "1"
+	username := "faner201"
+	password := "locaut"
+	email := "polta@mail.ru"
+
+	user := User(id, username, password, email)
+
+	url := "/portfolios/aboba&faner201"
+	createrUser := user.Username
+	name := "aboba"
+	text := &[]models.Text{
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+	}
+	photo := &[]models.Photo{
+		{
+			Addres: "cd/42342dsfs3",
+		},
+		{
+			Addres: "cd/42342dsfs3",
+		},
+	}
+	colors := &models.Colors{
+		Base:      "#fff",
+		Text:      "#dsfsdfs",
+		Contrast:  "#fdsfsdcxs",
+		Primary:   "#fdsfsdf",
+		Secondary: "#fdsfxz",
 	}
 
-	portfolio := &models.Portfolio{
-		ID:          "1",
-		Url:         "https://portfolio_you/&lopata/6",
-		CreaterUser: user.Username,
-		Global: models.Global{
-			Name: "Very best",
-			View: "nice, popit",
-			Bg:   "not nice, impossible",
+	structs := &[][]models.Block{
+		{
+			{
+				Type:     "text",
+				Location: "1",
+			},
+			{
+				Type:     "text",
+				Location: "2",
+			},
+			{
+				Type:     "image",
+				Location: "1",
+			},
 		},
-		Struct: models.Struct{
-			StructList: []interface{}{
-				models.BlockPhoto{
-					Photo: "cd:/fdsfsdfsd",
-				}, models.BlockPhoto{
-					Photo: "cd:/fdsfwerwefds",
-				}, models.BlockText{
-					Text: "Very impoaible",
-				},
+		{
+			{
+				Type:     "image",
+				Location: "2",
+			},
+			{
+				Type:     "text",
+				Location: "3",
+			},
+			{
+				Type:     "text",
+				Location: "4",
 			},
 		},
 	}
+
+	portfolio := Portfolio(id, url, createrUser, name, text, photo, colors, structs)
 
 	p.CreatePortfolio(context.Background(), portfolio, user)
 

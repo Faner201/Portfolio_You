@@ -17,18 +17,16 @@ func User(name, email, password string) *models.User {
 	}
 }
 
-func Portfolio(name, view, bg, url, createUser string, structs []interface{}) *models.Portfolio {
+func Portfolio(url, createrUser, name string, text *[]models.Text, photo *[]models.Photo, colors *models.Colors,
+	structs *[][]models.Block) *models.Portfolio {
 	return &models.Portfolio{
 		Url:         url,
-		CreaterUser: createUser,
-		Global: models.Global{
-			Name: name,
-			View: view,
-			Bg:   bg,
-		},
-		Struct: models.Struct{
-			StructList: structs,
-		},
+		CreaterUser: createrUser,
+		Name:        name,
+		Text:        text,
+		Photo:       photo,
+		Colors:      colors,
+		Struct:      structs,
 	}
 }
 
@@ -46,30 +44,77 @@ func TestCreatePortfolio(t *testing.T) {
 
 	pf := NewPortfolioUseCase(rep)
 
-	url := "/portfolio/lopata%faner201"
-	name := "lopata"
-	view := "very good, polka"
-	bg := "very interesting"
-	blockPhoto := "cd/fsdgsdgsd"
-	blockText := "fdsfsdfds"
-	structs := []interface{}{
-		models.BlockPhoto{
-			Photo: blockPhoto,
-		},
-		models.BlockText{
-			Text: blockText,
-		},
-	}
-
 	username := "faner201"
 	password := "locaut"
 	email := "polta@mail.ru"
 
 	user := User(username, email, password)
-	portfolio := Portfolio(name, view, bg, url, user.Username, structs)
+
+	url := "/portfolio/aboba%faner201"
+	name := "aboba"
+	text := &[]models.Text{
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+	}
+	photo := &[]models.Photo{
+		{
+			Addres: "cd/42342dsfs3",
+		},
+		{
+			Addres: "cd/42342dsfs3",
+		},
+	}
+	colors := &models.Colors{
+		Base:      "#fff",
+		Text:      "#dsfsdfs",
+		Contrast:  "#fdsfsdcxs",
+		Primary:   "#fdsfsdf",
+		Secondary: "#fdsfxz",
+	}
+
+	structs := &[][]models.Block{
+		{
+			{
+				Type:     "text",
+				Location: "1",
+			},
+			{
+				Type:     "text",
+				Location: "2",
+			},
+			{
+				Type:     "image",
+				Location: "1",
+			},
+		},
+		{
+			{
+				Type:     "image",
+				Location: "2",
+			},
+			{
+				Type:     "text",
+				Location: "3",
+			},
+			{
+				Type:     "text",
+				Location: "4",
+			},
+		},
+	}
+
+	portfolio := Portfolio(url, user.Username, name, text, photo, colors, structs)
 
 	rep.On("CreatePortfolio", portfolio, user).Return(nil)
-	err := pf.CreatePortfolio(context.Background(), user, name, view, bg, structs)
+	err := pf.CreatePortfolio(context.Background(), user, name, text, photo, colors, structs)
 	assert.NoError(t, err)
 }
 
@@ -99,27 +144,74 @@ func TestOpenPortfolio(t *testing.T) {
 	pf := NewPortfolioUseCase(rep)
 
 	username := "faner201"
-	email := "polta@mail.ru"
 	password := "locaut"
+	email := "polta@mail.ru"
+
+	user := User(username, email, password)
 
 	portfolioID := "1"
-	url := "/portfolio/lopata%faner201"
-	name := "lopata"
-	view := "very good, polka"
-	bg := "very interesting"
-	blockPhoto := "cd/fsdgsdgsd"
-	blockText := "fdsfsdfds"
-	structs := []interface{}{
-		models.BlockPhoto{
-			Photo: blockPhoto,
+	url := "/portfolio/aboba%faner201"
+	name := "aboba"
+	text := &[]models.Text{
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
 		},
-		models.BlockText{
-			Text: blockText,
+		{
+			Sludge: "avtobot",
+			Style:  "limitic",
+			Size:   "12",
+		},
+	}
+	photo := &[]models.Photo{
+		{
+			Addres: "cd/42342dsfs3",
+		},
+		{
+			Addres: "cd/42342dsfs3",
+		},
+	}
+	colors := &models.Colors{
+		Base:      "#fff",
+		Text:      "#dsfsdfs",
+		Contrast:  "#fdsfsdcxs",
+		Primary:   "#fdsfsdf",
+		Secondary: "#fdsfxz",
+	}
+
+	structs := &[][]models.Block{
+		{
+			{
+				Type:     "text",
+				Location: "1",
+			},
+			{
+				Type:     "text",
+				Location: "2",
+			},
+			{
+				Type:     "image",
+				Location: "1",
+			},
+		},
+		{
+			{
+				Type:     "image",
+				Location: "2",
+			},
+			{
+				Type:     "text",
+				Location: "3",
+			},
+			{
+				Type:     "text",
+				Location: "4",
+			},
 		},
 	}
 
-	user := User(username, email, password)
-	portfolio := Portfolio(name, view, bg, url, user.Username, structs)
+	portfolio := Portfolio(url, user.Username, name, text, photo, colors, structs)
 
 	rep.On("GetPortfolioByUserName", username, portfolioID).Return(portfolio, nil)
 	portf, err := pf.OpenPortfolio(context.Background(), user, portfolioID)

@@ -21,18 +21,16 @@ func CreateURL(name, createrName string) string {
 	return url
 }
 
-func (p *PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, name, view, bg string, structs []interface{}) error {
+func (p *PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, name string, text *[]models.Text,
+	photo *[]models.Photo, colors *models.Colors, structs *[][]models.Block) error {
 	portf := &models.Portfolio{
 		Url:         CreateURL(name, user.Username),
 		CreaterUser: user.Username,
-		Global: models.Global{
-			Name: name,
-			View: view,
-			Bg:   bg,
-		},
-		Struct: models.Struct{
-			StructList: structs,
-		},
+		Name:        name,
+		Text:        text,
+		Photo:       photo,
+		Colors:      colors,
+		Struct:      structs,
 	}
 
 	return p.portfolioRepo.CreatePortfolio(ctx, portf, user)

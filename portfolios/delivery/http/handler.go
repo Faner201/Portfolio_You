@@ -10,11 +10,36 @@ import (
 )
 
 type Portfolio struct {
-	ID          string        `json:"id"`
-	URL         string        `json:"url"`
-	CreaterUser string        `json:"createrUser"`
-	Global      models.Global `json:"global"`
-	Struct      models.Struct `json:"struct"`
+	ID          string     `json:"id"`
+	URL         string     `json:"url"`
+	CreaterUser string     `json:"createrUser"`
+	Text        *[]Text    `json:"text"`
+	Photo       *[]Photo   `json:"photo"`
+	Colors      *Colors    `json:"colors"`
+	Struct      *[][]Block `json:"blocks"`
+}
+
+type Text struct {
+	Sludge string `json:"sludge"`
+	Style  string `json:"style"`
+	Size   string `json:"size"`
+}
+
+type Photo struct {
+	Address string `json:"addres"`
+}
+
+type Colors struct {
+	Base      string `json:"base"`
+	Text      string `json:"text"`
+	Contrast  string `json:"contrast"`
+	Primary   string `json:"primary"`
+	Secondary string `json:"secondary"`
+}
+
+type Block struct {
+	Type     string `json:"type"`
+	Location string `json:"location"`
 }
 
 type Menu struct {
@@ -36,16 +61,12 @@ func NewHandler(useCase portfolios.UseCase) *Handler {
 }
 
 type createInputPortf struct {
-	URL         string `json:"url"`
-	CreaterUser string `json:"createrUser"`
-	Global      struct {
-		Name string `json:"name"`
-		View string `json:"view"`
-		Bg   string `json:"bg"`
-	} `json:"Global"`
-	Struct struct {
-		StructList []interface{} `json:"structList"`
-	} `json:"struct"`
+	URL         string     `json:"url"`
+	CreaterUser string     `json:"createrUser"`
+	Text        *[]Text    `json:"text"`
+	Photo       *[]Photo   `json:"photo"`
+	Colors      *Colors    `json:"colors"`
+	Struct      *[][]Block `json:"blocks"`
 }
 
 type createInputMenu struct {
@@ -108,6 +129,11 @@ func (h *Handler) CreateMenuPortfolio(c *gin.Context) {
 func (h *Handler) GetPortfolio(c *gin.Context) {
 	input := new(getPortfID)
 
+	if err := c.BindJSON(input); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
 	user := c.MustGet(auth.CtxUserKey).(*models.User)
 
 	portf, err := h.useCase.OpenPortfolio(c.Request.Context(), user, input.ID)
@@ -135,6 +161,24 @@ func (h *Handler) GetListMenu(c *gin.Context) {
 	})
 }
 
+func (h *Handler) DeletePortfolio(c *gin.Context) {
+	input := new(getPortfID)
+
+	if err := c.BindJSON(input); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	user := c.MustGet(auth.CtxUserKey).(*models.User)
+
+	if err := h.useCase.DeletePortfolio(c.Request.Context(), user, input.ID); err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
 func toListMenu(ls []*models.Menu) []*Menu {
 	out := make([]*Menu, len(ls))
 
@@ -154,21 +198,22 @@ func toMenu(m *models.Menu) *Menu {
 	}
 }
 
+func toText(t *[]models.Text) *[]Text {
+	mod := &[]Text{
+		{
+			Sludge: t.Sludge,
+			Style:  t.Style,
+			Size:   t.Size,
+		},
+	}
+	return mod
+}
+
 func toPortfolio(p *models.Portfolio) *Portfolio {
 	return &Portfolio{
 		ID:          p.ID,
 		URL:         p.Url,
 		CreaterUser: p.CreaterUser,
-		Global:      p.Global,
-		Struct:      p.Struct,
+		Text:        toText(p.Text),
 	}
 }
-
-// struct {
-// 	Name string `json:"name"`
-// 	View string `json:"view"`
-// 	Bg   string `json:"bg"`
-// } `json:"Global"`
-// Struct struct {
-// 	StructList []interface{} `json:"structList"`
-// } `json:"struct"`

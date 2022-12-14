@@ -6,15 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterHttpEndpoints(router *gin.RouterGroup, uc portfolios.UseCase) {
+func RegisterHttpEndpoints(router *gin.Engine, uc portfolios.UseCase) {
 	h := NewHandler(uc)
 
-	portfolio := router.Group("/portfolio")
+	portfolioEndPoints := router.Group("/portfolio")
 	{
-		portfolio.POST("/create", h.CreatePortfolio)
-		portfolio.POST("/create", h.CreateMenuPortfolio)
-		portfolio.GET("/open", h.GetPortfolio)
-		portfolio.GET("/menu", h.GetListMenu)
-		portfolio.DELETE("", h.DeletePortfolio)
+		portfolioEndPoints.POST("/create", h.CreatePortfolio)
+		// portfolioEndPoints.POST("/create", h.CreateMenuPortfolio)
+		// portfolioEndPoints.GET("/open", h.GetPortfolio)
+		// portfolioEndPoints.GET("/menu", h.GetListMenu)
+		// portfolioEndPoints.DELETE("", h.DeletePortfolio)
 	}
 }
