@@ -1,6 +1,6 @@
 package models
 
 type Block struct {
-	Type     string
-	Location string
+	Type     string `json:"type"`
+	Location string `json:"index"`
 }

@@ -1,5 +1,5 @@
 package models
 
 type Photo struct {
-	Addres string
+	Addres string `json:"src"`
 }

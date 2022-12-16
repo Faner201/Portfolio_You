@@ -1,12 +1,12 @@
 package models
 
 type Portfolio struct {
-	ID          string
-	Url         string
-	CreaterUser string
-	Name        string
-	Text        *[]Text
-	Photo       *[]Photo
-	Colors      *Colors
-	Struct      *[][]Block
+	ID          string     `json:"id"`
+	Url         string     `json:"url"`
+	CreaterUser string     `json:"createrUser"`
+	Name        string     `json:"name"`
+	Text        *[]Text    `json:"texts"`
+	Photo       *[]Photo   `json:"images"`
+	Colors      *Colors    `json:"colors"`
+	Struct      *[][]Block `json:"structure"`
 }

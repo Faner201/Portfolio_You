@@ -1,7 +1,7 @@
 package models
 
 type Text struct {
-	Sludge string
-	Style  string
-	Size   string
+	Sludge string `json:"text"`
+	Style  string `json:"style"`
+	Size   string `json:"size"`
 }

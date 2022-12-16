@@ -1,9 +1,9 @@
 package models
 
 type Colors struct {
-	Base      string
-	Text      string
-	Contrast  string
-	Primary   string
-	Secondary string
+	Base      string `json:"base"`
+	Text      string `json:"text"`
+	Contrast  string `json:"contrast"`
+	Primary   string `json:"primary"`
+	Secondary string `json:"secondary"`
 }

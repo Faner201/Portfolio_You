@@ -1,9 +1,9 @@
 package models
 
 type Menu struct {
-	ID          string
-	Name        string
-	CreaterName string
-	ShortText   string
-	Photo       string
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	CreaterName string `json:"createrName"`
+	ShortText   string `json:"shortText"`
+	Photo       string `json:"photo"`
 }

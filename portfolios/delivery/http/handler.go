@@ -9,47 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Portfolio struct {
-	ID          string     `json:"id"`
-	URL         string     `json:"url"`
-	CreaterUser string     `json:"createrUser"`
-	Text        *[]Text    `json:"text"`
-	Photo       *[]Photo   `json:"photo"`
-	Colors      *Colors    `json:"colors"`
-	Struct      *[][]Block `json:"blocks"`
-}
-
-type Text struct {
-	Sludge string `json:"sludge"`
-	Style  string `json:"style"`
-	Size   string `json:"size"`
-}
-
-type Photo struct {
-	Address string `json:"addres"`
-}
-
-type Colors struct {
-	Base      string `json:"base"`
-	Text      string `json:"text"`
-	Contrast  string `json:"contrast"`
-	Primary   string `json:"primary"`
-	Secondary string `json:"secondary"`
-}
-
-type Block struct {
-	Type     string `json:"type"`
-	Location string `json:"location"`
-}
-
-type Menu struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	CreaterName string `json:"createrName"`
-	ShortText   string `json:"shortText"`
-	Photo       string `json:"photo"`
-}
-
 type Handler struct {
 	useCase portfolios.UseCase
 }
@@ -61,12 +20,12 @@ func NewHandler(useCase portfolios.UseCase) *Handler {
 }
 
 type createInputPortf struct {
-	URL         string     `json:"url"`
-	CreaterUser string     `json:"createrUser"`
-	Text        *[]Text    `json:"text"`
-	Photo       *[]Photo   `json:"photo"`
-	Colors      *Colors    `json:"colors"`
-	Struct      *[][]Block `json:"blocks"`
+	CreaterUser string            `json:"createrUser"`
+	Name        string            `json:"name"`
+	Text        *[]models.Text    `json:"text"`
+	Photo       *[]models.Photo   `json:"photo"`
+	Colors      *models.Colors    `json:"colors"`
+	Struct      *[][]models.Block `json:"blocks"`
 }
 
 type createInputMenu struct {
@@ -81,11 +40,11 @@ type getPortfID struct {
 }
 
 type getPortfolio struct {
-	Portf *Portfolio `json:"portfolio"`
+	Portf *models.Portfolio `json:"portfolio"`
 }
 
 type getMenu struct {
-	Menu []*Menu `json:"menu"`
+	Menu []*models.Menu `json:"menu"`
 }
 
 func (h *Handler) CreatePortfolio(c *gin.Context) {
@@ -98,8 +57,7 @@ func (h *Handler) CreatePortfolio(c *gin.Context) {
 
 	user := c.MustGet(auth.CtxUserKey).(*models.User)
 
-	if err := h.useCase.CreatePortfolio(c.Request.Context(), user, input.Global.Name,
-		input.Global.View, input.Global.Bg, input.Struct.StructList); err != nil {
+	if err := h.useCase.CreatePortfolio(c.Request.Context(), user, input.Name, input.Text, input.Photo, input.Colors, input.Struct); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -134,16 +92,83 @@ func (h *Handler) GetPortfolio(c *gin.Context) {
 		return
 	}
 
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	// user := c.MustGet(auth.CtxUserKey).(*models.User)
 
-	portf, err := h.useCase.OpenPortfolio(c.Request.Context(), user, input.ID)
+	user := &models.User{
+		Username: "faner201",
+		Password: "lopata",
+	}
+
+	portf, err := h.useCase.OpenPortfolio(c.Request.Context(), user, input.ID) // местная заглушка для решения проблемы получения id с фронта
+	portf = &models.Portfolio{
+		Url:         "/portfolios/aboba&faner201",
+		CreaterUser: user.Username,
+		Name:        "aboba",
+		Text: &[]models.Text{
+			{
+				Sludge: "Хотел бы сказать этому артёму",
+				Style:  "bold",
+				Size:   "big",
+			},
+			{
+				Sludge: "Был бы ты человеком, а не дотером",
+				Style:  "italic",
+				Size:   "small",
+			},
+		},
+		Photo: &[]models.Photo{
+			{
+				Addres: "",
+			},
+			{
+				Addres: "",
+			},
+		},
+		Colors: &models.Colors{
+			Base:      "#4f634b",
+			Text:      "#79a5b3",
+			Contrast:  "#794e8a",
+			Primary:   "#7d8f49",
+			Secondary: "#d3f76a",
+		},
+		Struct: &[][]models.Block{
+			{
+				{
+					Type:     "text",
+					Location: "1",
+				},
+				{
+					Type:     "text",
+					Location: "1",
+				},
+				{
+					Type:     "image",
+					Location: "0",
+				},
+			},
+			{
+				{
+					Type:     "image",
+					Location: "1",
+				},
+				{
+					Type:     "text",
+					Location: "0",
+				},
+				{
+					Type:     "text",
+					Location: "1",
+				},
+			},
+		},
+	} // ужасная заглушка для просмотра отображения инфы с бэка на фронт
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
 	c.JSON(http.StatusOK, &getPortfolio{
-		Portf: toPortfolio(portf),
+		Portf: portf,
 	})
 }
 
@@ -157,7 +182,7 @@ func (h *Handler) GetListMenu(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, &getMenu{
-		Menu: toListMenu(list),
+		Menu: list,
 	})
 }
 
@@ -177,43 +202,4 @@ func (h *Handler) DeletePortfolio(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
-}
-
-func toListMenu(ls []*models.Menu) []*Menu {
-	out := make([]*Menu, len(ls))
-
-	for i, b := range ls {
-		out[i] = toMenu(b)
-	}
-	return out
-}
-
-func toMenu(m *models.Menu) *Menu {
-	return &Menu{
-		ID:          m.ID,
-		CreaterName: m.CreaterName,
-		Name:        m.Name,
-		ShortText:   m.ShortText,
-		Photo:       m.Photo,
-	}
-}
-
-func toText(t *[]models.Text) *[]Text {
-	mod := &[]Text{
-		{
-			Sludge: t.Sludge,
-			Style:  t.Style,
-			Size:   t.Size,
-		},
-	}
-	return mod
-}
-
-func toPortfolio(p *models.Portfolio) *Portfolio {
-	return &Portfolio{
-		ID:          p.ID,
-		URL:         p.Url,
-		CreaterUser: p.CreaterUser,
-		Text:        toText(p.Text),
-	}
 }
