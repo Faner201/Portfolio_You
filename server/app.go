@@ -46,6 +46,7 @@ func NewApp() *App {
 
 func (a *App) Run(port string) error {
 	router := gin.Default()
+	router.MaxMultipartMemory = 8 << 20
 	router.Use(
 		gin.Recovery(),
 		gin.Logger(),

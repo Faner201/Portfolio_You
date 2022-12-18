@@ -5,6 +5,7 @@ import (
 	"Portfolio_You/models"
 	"Portfolio_You/portfolios"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -47,15 +48,42 @@ type getMenu struct {
 	Menu []*models.Menu `json:"menu"`
 }
 
+func savePicture(c *gin.Context) *[]models.Photo {
+	form, _ := c.MultipartForm()
+	photos := form.File["photo"]
+
+	model := new(models.Photo)
+	list := []models.Photo{}
+
+	for _, photo := range photos {
+		dir, _ := filepath.Abs(photo.Filename)
+		dir, _ = filepath.Split(dir)
+		dir = filepath.Dir(filepath.Dir(dir))
+		filename := filepath.Join(dir, "src", photo.Filename)
+		c.SaveUploadedFile(photo, filename)
+		model.Addres = filename
+		list = append(list, *model)
+	}
+
+	return &list
+}
+
 func (h *Handler) CreatePortfolio(c *gin.Context) {
 	input := new(createInputPortf)
 
-	if err := c.BindJSON(input); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
+	// if err := c.BindJSON(input); err != nil {
+	// 	c.AbortWithStatus(http.StatusBadRequest)
+	// 	return
+	// }
 
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	input.Photo = savePicture(c)
+
+	// user := c.MustGet(auth.CtxUserKey).(*models.User)
+
+	user := &models.User{
+		Username: "faner201",
+		Password: "lopata",
+	}
 
 	if err := h.useCase.CreatePortfolio(c.Request.Context(), user, input.Name, input.Text, input.Photo, input.Colors, input.Struct); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
