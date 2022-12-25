@@ -18,6 +18,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type App struct {
@@ -27,8 +29,11 @@ type App struct {
 }
 
 func NewApp() *App {
-	userRepo := authDatabase.NewUserRepository()
-	portfolioRepo := portfDatabase.NewPortfolioRepository()
+	db := initDB()
+
+	userRepo := authDatabase.NewUserRepository(db, "User")
+	portfolioRepo := portfDatabase.NewPortfolioRepository(db, "Portfolio")
+	// userRepo := authDatabase.NewUserRepository()
 
 	return &App{
 		portfolioUC: portfUseCase.NewPortfolioUseCase(portfolioRepo),
@@ -52,11 +57,12 @@ func (a *App) Run(port string) error {
 		gin.Logger(),
 		cors.Default(),
 	)
+	router.Static("/portfolio/open", "/Users/fanfurick/Documents/Profile_You/src") // очень строгий код, хз что с ним делать ./src вообще не хочет читать
 
 	authHttp.RegisterHttpEndpoints(router, a.authUC)
 
-	// authMiddleware := authHttp.NewAuthMiddleware(a.authUC)
-	api := router.Group("")
+	authMiddleware := authHttp.NewAuthMiddleware(a.authUC)
+	api := router.Group("", authMiddleware)
 
 	portfHttp.RegisterHttpEndpoints(api, a.portfolioUC)
 
@@ -83,4 +89,24 @@ func (a *App) Run(port string) error {
 	defer shutdown()
 
 	return a.httpServer.Shutdown(ctx)
+}
+
+func initDB() *mongo.Database {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	if err != nil {
+		log.Fatalf("Error occured while establishing connection to mongoDB")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := client.Connect(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := client.Ping(context.Background(), nil); err != nil {
+		log.Fatal(err)
+	}
+
+	return client.Database("PortfolioYou")
 }
