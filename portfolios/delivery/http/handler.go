@@ -4,8 +4,8 @@ import (
 	"Portfolio_You/auth"
 	"Portfolio_You/models"
 	"Portfolio_You/portfolios"
+	"log"
 	"net/http"
-	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,12 +21,12 @@ func NewHandler(useCase portfolios.UseCase) *Handler {
 }
 
 type createInputPortf struct {
-	CreaterUser string            `json:"createrUser"`
-	Name        string            `json:"name"`
-	Text        *[]models.Text    `json:"text"`
-	Photo       *[]models.Photo   `json:"photo"`
-	Colors      *models.Colors    `json:"colors"`
-	Struct      *[][]models.Block `json:"blocks"`
+	CreaterUser string            `json:"createrUser" form:"createrUser"`
+	Name        string            `json:"name" form:"name"`
+	Text        *[]models.Text    `json:"texts" form:"texts"`
+	Photo       *[]models.Photo   `json:"images" form:"images"`
+	Colors      *models.Colors    `json:"colors" form:"colors"`
+	Struct      *[][]models.Block `json:"structure" form:"structure"`
 }
 
 type createInputMenu struct {
@@ -56,12 +56,8 @@ func savePicture(c *gin.Context) *[]models.Photo {
 	list := []models.Photo{}
 
 	for _, photo := range photos {
-		dir, _ := filepath.Abs(photo.Filename)
-		dir, _ = filepath.Split(dir)
-		dir = filepath.Dir(filepath.Dir(dir))
-		filename := filepath.Join(dir, "src", photo.Filename)
-		c.SaveUploadedFile(photo, filename)
-		model.Addres = filename
+		c.SaveUploadedFile(photo, photo.Filename)
+		model.Addres = photo.Filename
 		list = append(list, *model)
 	}
 
@@ -71,19 +67,26 @@ func savePicture(c *gin.Context) *[]models.Photo {
 func (h *Handler) CreatePortfolio(c *gin.Context) {
 	input := new(createInputPortf)
 
+	if err := c.ShouldBind(input); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	log.Println(input)
+
 	// if err := c.BindJSON(input); err != nil {
 	// 	c.AbortWithStatus(http.StatusBadRequest)
 	// 	return
 	// }
 
-	input.Photo = savePicture(c)
+	// input.Photo = savePicture(c)
 
-	// user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(auth.CtxUserKey).(*models.User)
 
-	user := &models.User{
-		Username: "faner201",
-		Password: "lopata",
-	}
+	// user := &models.User{
+	// 	Username: "faner201",
+	// 	Password: "lopata",
+	// }
 
 	if err := h.useCase.CreatePortfolio(c.Request.Context(), user, input.Name, input.Text, input.Photo, input.Colors, input.Struct); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -120,76 +123,74 @@ func (h *Handler) GetPortfolio(c *gin.Context) {
 		return
 	}
 
-	// user := c.MustGet(auth.CtxUserKey).(*models.User)
+	log.Println(input)
 
-	user := &models.User{
-		Username: "faner201",
-		Password: "lopata",
-	}
+	user := c.MustGet(auth.CtxUserKey).(*models.User)
+
+	// user := &models.User{
+	// 	Username: "faner201",
+	// 	Password: "lopata",
+	// }
 
 	portf, err := h.useCase.OpenPortfolio(c.Request.Context(), user, input.ID) // местная заглушка для решения проблемы получения id с фронта
-	portf = &models.Portfolio{
-		Url:         "/portfolios/aboba&faner201",
-		CreaterUser: user.Username,
-		Name:        "aboba",
-		Text: &[]models.Text{
-			{
-				Sludge: "Хотел бы сказать этому артёму",
-				Style:  "bold",
-				Size:   "big",
-			},
-			{
-				Sludge: "Был бы ты человеком, а не дотером",
-				Style:  "italic",
-				Size:   "small",
-			},
-		},
-		Photo: &[]models.Photo{
-			{
-				Addres: "",
-			},
-			{
-				Addres: "",
-			},
-		},
-		Colors: &models.Colors{
-			Base:      "#4f634b",
-			Text:      "#79a5b3",
-			Contrast:  "#794e8a",
-			Primary:   "#7d8f49",
-			Secondary: "#d3f76a",
-		},
-		Struct: &[][]models.Block{
-			{
-				{
-					Type:     "text",
-					Location: "1",
-				},
-				{
-					Type:     "text",
-					Location: "1",
-				},
-				{
-					Type:     "image",
-					Location: "0",
-				},
-			},
-			{
-				{
-					Type:     "image",
-					Location: "1",
-				},
-				{
-					Type:     "text",
-					Location: "0",
-				},
-				{
-					Type:     "text",
-					Location: "1",
-				},
-			},
-		},
-	} // ужасная заглушка для просмотра отображения инфы с бэка на фронт
+	// portf = &models.Portfolio{
+	// 	Url:         "/portfolios/aboba&faner201",
+	// 	CreaterUser: user.Username,
+	// 	Name:        "aboba",
+	// 	Text: &[]models.Text{
+	// 		{
+	// 			Sludge: "Хотел бы сказать этому артёму",
+	// 			Style:  "bold",
+	// 			Size:   "big",
+	// 		},
+	// 		{
+	// 			Sludge: "Был бы ты человеком, а не дотером",
+	// 			Style:  "italic",
+	// 			Size:   "small",
+	// 		},
+	// 	},
+	// 	Photo: &[]models.Photo{
+	// 		{
+	// 			Addres: "/Users/fanfurick/Documents/Profile_You/src/photo.jpeg",
+	// 		},
+	// 		{
+	// 			Addres: "/Users/fanfurick/Documents/Profile_You/src/photo.jpeg",
+	// 		},
+	// 	},
+	// 	Colors: &models.Colors{
+	// 		Base:      "#4f634b",
+	// 		Text:      "#79a5b3",
+	// 		Contrast:  "#794e8a",
+	// 		Primary:   "#7d8f49",
+	// 		Secondary: "#d3f76a",
+	// 	},
+	// 	Struct: &[][]models.Block{
+	// 		{
+	// 			{
+	// 				Type:     "text",
+	// 				Location: "1",
+	// 			},
+	// 			{
+	// 				Type:     "text",
+	// 				Location: "1",
+	// 			},
+	// 		},
+	// 		{
+	// 			{
+	// 				Type:     "image",
+	// 				Location: "1",
+	// 			},
+	// 			{
+	// 				Type:     "text",
+	// 				Location: "0",
+	// 			},
+	// 			{
+	// 				Type:     "text",
+	// 				Location: "1",
+	// 			},
+	// 		},
+	// 	},
+	// } // ужасная заглушка для просмотра отображения инфы с бэка на фронт
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return

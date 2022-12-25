@@ -4,7 +4,6 @@ import (
 	"Portfolio_You/models"
 	"Portfolio_You/portfolios"
 	"context"
-	"log"
 )
 
 type PortfolioUseCase struct {
@@ -33,9 +32,6 @@ func (p *PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.Use
 		Colors:      colors,
 		Struct:      structs,
 	}
-
-	log.Println(portf)
-
 	return p.portfolioRepo.CreatePortfolio(ctx, portf, user)
 }
 
