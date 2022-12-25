@@ -1,5 +1,6 @@
-"POST portfolio/create"
+"POST portfolio/open"
 {
+    "url" : "http://portfolio_you/name",
     "createrUser" : "faner201",
     "name" : "aboba",
     "texts" : [
@@ -38,28 +39,6 @@
                 "type" : "image",
                 "index" : "1"
             }
-        ],
-        [
-            {
-                "type" : "text",
-                "index" : "1"
-            },
-            {
-                "type" : "text",
-                "index" : "2"
-            },
-            {
-                "type" : "image",
-                "index" : "1"
-            }
         ]
     ]
-}
-
-"POST portfolio/create/menu"
-
-{
-    "name" : "aboba",
-    "shortText" : "Я бы сказал этому артёму",
-    "photo" : "cd/gsdgsdfwerwedfwf"
 }
