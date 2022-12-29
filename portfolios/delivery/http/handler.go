@@ -67,17 +67,17 @@ func savePicture(c *gin.Context) *[]models.Photo {
 func (h *Handler) CreatePortfolio(c *gin.Context) {
 	input := new(createInputPortf)
 
-	if err := c.ShouldBind(input); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	log.Println(input)
-
-	// if err := c.BindJSON(input); err != nil {
+	// if err := c.ShouldBind(input); err != nil {
 	// 	c.AbortWithStatus(http.StatusBadRequest)
 	// 	return
 	// }
+
+	// log.Println(input)
+
+	if err := c.BindJSON(input); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
 
 	// input.Photo = savePicture(c)
 

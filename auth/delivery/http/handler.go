@@ -2,6 +2,7 @@ package http
 
 import (
 	"Portfolio_You/auth"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,8 @@ type signInputToken struct {
 func (h *Handler) SignUp(c *gin.Context) {
 	input := new(SignUp)
 
+	log.Println(input)
+
 	if err := c.BindJSON(input); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -55,6 +58,8 @@ func (h *Handler) SignIn(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
+
+	log.Println()
 
 	token, err := h.useCase.SignIn(c.Request.Context(), input.Username, input.Password)
 	if err != nil {
