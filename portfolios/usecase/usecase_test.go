@@ -234,12 +234,11 @@ func TestGetListPortfolio(t *testing.T) {
 
 	user := User(username, email, password)
 
-	menuList := []*models.Menu{
-		Menu(name, user.Username, shortText, photo),
-		Menu(name, user.Username, shortText, photo),
-		Menu(name, user.Username, shortText, photo),
-	}
-	rep.On("GetListPortfolioByUserName", username).Return(menuList, nil)
+	menu := Menu(name, username, shortText, photo)
+	menuList := []models.Menu{}
+	menuList = append(menuList, *menu)
+
+	rep.On("GetListPortfolioByUserName", username).Return(&menuList, nil)
 	list, err := pf.GetListPorfolio(context.Background(), user)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, list)

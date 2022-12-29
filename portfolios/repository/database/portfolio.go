@@ -94,7 +94,7 @@ func (p PortfolioRepository) GetPortfolioByUserName(ctx context.Context, userNam
 	}, nil
 }
 
-func (p PortfolioRepository) GetListPortfolioByUserName(ctx context.Context, userName string) ([]*models.Menu, error) {
+func (p PortfolioRepository) GetListPortfolioByUserName(ctx context.Context, userName string) (*[]models.Menu, error) {
 
 	cur, err := p.db.Find(ctx, bson.M{
 		"createrName": userName,
@@ -105,7 +105,7 @@ func (p PortfolioRepository) GetListPortfolioByUserName(ctx context.Context, use
 		return nil, err
 	}
 
-	list := make([]*models.Menu, 0)
+	list := []models.Menu{}
 
 	for cur.Next(ctx) {
 		modelMenu := new(models.Menu)
@@ -114,13 +114,13 @@ func (p PortfolioRepository) GetListPortfolioByUserName(ctx context.Context, use
 			return nil, err
 		}
 
-		list = append(list, modelMenu)
+		list = append(list, *modelMenu)
 	}
 	if err := cur.Err(); err != nil {
 		return nil, err
 	}
 
-	return list, nil
+	return &list, nil
 }
 
 func (p PortfolioRepository) DeletePortfolio(ctx context.Context, user *models.User, portfolioID string) error {

@@ -227,7 +227,7 @@ func TestGetListPortfolioByUserName(t *testing.T) {
 
 	returnedPortfolio, err := p.GetListPortfolioByUserName(context.Background(), user.Username)
 	assert.NoError(t, err)
-	assert.Equal(t, 10, len(returnedPortfolio))
+	assert.Equal(t, 10, len(*returnedPortfolio))
 
 	returnedPortfolio, err = p.GetListPortfolioByUserName(context.Background(), "lodsfsdfs")
 	assert.Error(t, err)

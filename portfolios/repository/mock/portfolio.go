@@ -29,10 +29,10 @@ func (m *PortfolioMock) GetPortfolioByUserName(ctx context.Context, userName str
 	return args.Get(0).(*models.Portfolio), args.Error(1)
 }
 
-func (m *PortfolioMock) GetListPortfolioByUserName(ctx context.Context, userName string) ([]*models.Menu, error) {
+func (m *PortfolioMock) GetListPortfolioByUserName(ctx context.Context, userName string) (*[]models.Menu, error) {
 	args := m.Called(userName)
 
-	return args.Get(0).([]*models.Menu), args.Error(1)
+	return args.Get(0).(*[]models.Menu), args.Error(1)
 }
 
 func (m *PortfolioMock) DeletePortfolio(ctx context.Context, user *models.User, portportfolioID string) error {

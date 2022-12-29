@@ -45,7 +45,7 @@ type getPortfolio struct {
 }
 
 type getMenu struct {
-	Menu []*models.Menu `json:"menu"`
+	Menu *[]models.Menu `json:"menu"`
 }
 
 func savePicture(c *gin.Context) *[]models.Photo {

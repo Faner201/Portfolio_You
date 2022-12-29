@@ -30,10 +30,10 @@ func (m *PortfolioUseCaseMock) OpenPortfolio(ctx context.Context, user *models.U
 	return args.Get(0).(*models.Portfolio), args.Error(1)
 }
 
-func (m *PortfolioUseCaseMock) GetListPorfolio(ctx context.Context, user *models.User) ([]*models.Menu, error) {
+func (m *PortfolioUseCaseMock) GetListPorfolio(ctx context.Context, user *models.User) (*[]models.Menu, error) {
 	args := m.Called(user)
 
-	return args.Get(0).([]*models.Menu), args.Error(1)
+	return args.Get(0).(*[]models.Menu), args.Error(1)
 }
 
 func (m *PortfolioUseCaseMock) DeletePortfolio(ctx context.Context, user *models.User, portfolioID string) error {

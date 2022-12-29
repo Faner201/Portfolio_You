@@ -50,7 +50,7 @@ func (p PortfolioUseCase) OpenPortfolio(ctx context.Context, user *models.User, 
 	return p.portfolioRepo.GetPortfolioByUserName(ctx, user.Username, portfolioID)
 }
 
-func (p PortfolioUseCase) GetListPorfolio(ctx context.Context, user *models.User) ([]*models.Menu, error) {
+func (p PortfolioUseCase) GetListPorfolio(ctx context.Context, user *models.User) (*[]models.Menu, error) {
 	return p.portfolioRepo.GetListPortfolioByUserName(ctx, user.Username)
 }
 

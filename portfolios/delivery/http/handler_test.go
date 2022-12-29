@@ -278,25 +278,25 @@ func TestGetListMenu(t *testing.T) {
 
 	RegisterHttpEndpoints(group, uc)
 
-	list := make([]*models.Menu, 5)
+	list := []models.Menu{}
 
 	for i := 0; i < 5; i++ {
-		list[i] = &models.Menu{
+		list = append(list, models.Menu{
 			ID:          "1",
 			Name:        "aboba",
 			CreaterName: user.Username,
 			ShortText:   "lopata",
 			Photo:       "cd/fsdfsdfs",
-		}
+		})
 	}
 
-	uc.On("GetListPorfolio", user).Return(list, nil)
+	uc.On("GetListPorfolio", user).Return(&list, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/portfolio/menu", nil)
 	r.ServeHTTP(w, req)
 
-	expectedOut := &getMenu{Menu: list}
+	expectedOut := getMenu{Menu: &list}
 
 	expectedOutBody, err := json.Marshal(expectedOut)
 	assert.NoError(t, err)

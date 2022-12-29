@@ -61,21 +61,21 @@ func (p *PortfolioLocalStorage) GetPortfolioByUserName(ctx context.Context, user
 	return nil, portfolios.ErrGetPortfolioByUserName
 }
 
-func (p *PortfolioLocalStorage) GetListPortfolioByUserName(ctx context.Context, userName string) ([]*models.Menu, error) {
-	menus := make([]*models.Menu, 0)
+func (p *PortfolioLocalStorage) GetListPortfolioByUserName(ctx context.Context, userName string) (*[]models.Menu, error) {
+	list := []models.Menu{}
 
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	for _, menu := range p.menus {
 		if menu.CreaterName == userName {
-			menus = append(menus, menu)
+			list = append(list, *menu)
 		} else {
 			return nil, portfolios.ErrGetListPortfolio
 		}
 	}
 
-	return menus, nil
+	return &list, nil
 }
 
 func (p *PortfolioLocalStorage) DeletePortfolio(ctx context.Context, user *models.User, portfolioID string) error {
