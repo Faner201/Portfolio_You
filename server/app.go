@@ -18,6 +18,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -31,20 +32,16 @@ type App struct {
 func NewApp() *App {
 	db := initDB()
 
-	userRepo := authDatabase.NewUserRepository(db, "User")
-	portfolioRepo := portfDatabase.NewPortfolioRepository(db, "Portfolio")
-	// userRepo := authDatabase.NewUserRepository()
+	userRepo := authDatabase.NewUserRepository(db, viper.GetString("mongo.user_collection"))
+	portfolioRepo := portfDatabase.NewPortfolioRepository(db, viper.GetString("mongo.portfolio_collection"))
 
 	return &App{
 		portfolioUC: portfUseCase.NewPortfolioUseCase(portfolioRepo),
 		authUC: authUseCase.NewAuthUseCase(
 			userRepo,
-			"hash_salt",
-			[]byte("signing_key"),
-			86400,
-			// viper.GetString("auth.hash_salt"),
-			// []byte(viper.GetString("auth.signing_key")),
-			// viper.GetDuration("auth.token_ttl"),
+			viper.GetString("auth.hash_salt"),
+			[]byte(viper.GetString("auth.signing_key")),
+			viper.GetDuration("auth.token_ttl"),
 		),
 	}
 }
@@ -92,7 +89,7 @@ func (a *App) Run(port string) error {
 }
 
 func initDB() *mongo.Database {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.NewClient(options.Client().ApplyURI(viper.GetString("mongo.uri")))
 	if err != nil {
 		log.Fatalf("Error occured while establishing connection to mongoDB")
 	}
@@ -108,5 +105,5 @@ func initDB() *mongo.Database {
 		log.Fatal(err)
 	}
 
-	return client.Database("PortfolioYou")
+	return client.Database(viper.GetString("mongo.name"))
 }

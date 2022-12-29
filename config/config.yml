@@ -4,3 +4,12 @@ auth:
   hash_salt: "hash_salt"
   signing_key: "signing_key"
   token_ttl: 86400
+
+mongo:
+  uri: "mongodb://localhost:27017"
+  name: "PortfolioYou"
+  user_collection: "User"
+  portfolio_collection: "Portfolio"
+
+privileges:
+  user: "user"

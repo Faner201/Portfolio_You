@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 type AuthMiddleware struct {
@@ -47,5 +48,5 @@ func (m *AuthMiddleware) Handle(c *gin.Context) {
 		return
 	}
 
-	c.Set(auth.CtxUserKey, user)
+	c.Set(viper.GetString("privileges.user"), user)
 }

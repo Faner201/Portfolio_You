@@ -1,13 +1,13 @@
 package http
 
 import (
-	"Portfolio_You/auth"
 	"Portfolio_You/models"
 	"Portfolio_You/portfolios"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 type Handler struct {
@@ -81,7 +81,7 @@ func (h *Handler) CreatePortfolio(c *gin.Context) {
 
 	// input.Photo = savePicture(c)
 
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
 
 	// user := &models.User{
 	// 	Username: "faner201",
@@ -104,7 +104,7 @@ func (h *Handler) CreateMenuPortfolio(c *gin.Context) {
 		return
 	}
 
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
 
 	if err := h.useCase.CreateMenuPortfolio(c.Request.Context(), user, input.Name,
 		input.ShortText, input.Photo); err != nil {
@@ -125,7 +125,7 @@ func (h *Handler) GetPortfolio(c *gin.Context) {
 
 	log.Println(input)
 
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
 
 	// user := &models.User{
 	// 	Username: "faner201",
@@ -202,7 +202,7 @@ func (h *Handler) GetPortfolio(c *gin.Context) {
 }
 
 func (h *Handler) GetListMenu(c *gin.Context) {
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
 
 	list, err := h.useCase.GetListPorfolio(c.Request.Context(), user)
 	if err != nil {
@@ -223,7 +223,7 @@ func (h *Handler) DeletePortfolio(c *gin.Context) {
 		return
 	}
 
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
 
 	if err := h.useCase.DeletePortfolio(c.Request.Context(), user, input.ID); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)

@@ -1,7 +1,6 @@
 package http
 
 import (
-	"Portfolio_You/auth"
 	"Portfolio_You/models"
 	"Portfolio_You/portfolios/usecase"
 	"bytes"
@@ -11,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +23,7 @@ func TestCreatePortfolio(t *testing.T) {
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
-		c.Set(auth.CtxUserKey, user)
+		c.Set(viper.GetString("privileges.user"), user)
 	})
 
 	uc := new(usecase.PortfolioUseCaseMock)
@@ -121,7 +121,7 @@ func TestCreateMenuPortfolio(t *testing.T) {
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
-		c.Set(auth.CtxUserKey, user)
+		c.Set(viper.GetString("privileges.user"), user)
 	})
 
 	uc := new(usecase.PortfolioUseCaseMock)
@@ -163,7 +163,7 @@ func TestGetPortfolio(t *testing.T) {
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
-		c.Set(auth.CtxUserKey, user)
+		c.Set(viper.GetString("privileges.user"), user)
 	})
 
 	uc := new(usecase.PortfolioUseCaseMock)
@@ -271,7 +271,7 @@ func TestGetListMenu(t *testing.T) {
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
-		c.Set(auth.CtxUserKey, user)
+		c.Set(viper.GetString("privileges.user"), user)
 	})
 
 	uc := new(usecase.PortfolioUseCaseMock)
@@ -314,7 +314,7 @@ func TestDeletePortfolio(t *testing.T) {
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
-		c.Set(auth.CtxUserKey, user)
+		c.Set(viper.GetString("privileges.user"), user)
 	})
 
 	uc := new(usecase.PortfolioUseCaseMock)
