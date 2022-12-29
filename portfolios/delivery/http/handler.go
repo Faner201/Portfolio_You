@@ -5,6 +5,7 @@ import (
 	"Portfolio_You/portfolios"
 	"log"
 	"net/http"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -48,7 +49,37 @@ type getMenu struct {
 	Menu *[]models.Menu `json:"menu"`
 }
 
-func savePicture(c *gin.Context) *[]models.Photo {
+func (h *Handler) validateDatePortfolio(p *createInputPortf) error {
+
+	for _, letter := range p.Name {
+		if unicode.IsSymbol(letter) {
+			return portfolios.ErrSpecialSymbolName
+		}
+	}
+
+	if p.Text == nil {
+		return portfolios.ErrNotTextPortfolio
+	}
+
+	if p.Struct == nil {
+		return portfolios.ErrFullnessPortfolio
+	}
+	return nil
+}
+
+func (h *Handler) validateDateMenu(m *createInputMenu) error {
+	for _, letter := range m.Name {
+		if unicode.IsSymbol(letter) {
+			return portfolios.ErrSpecialSymbolName
+		}
+	}
+
+	//возможно нужно будет валидировать что есть фотка и текст
+
+	return nil
+}
+
+func (h *Handler) savePicture(c *gin.Context) *[]models.Photo {
 	form, _ := c.MultipartForm()
 	photos := form.File["photo"]
 
@@ -74,19 +105,19 @@ func (h *Handler) CreatePortfolio(c *gin.Context) {
 
 	// log.Println(input)
 
-	if err := c.BindJSON(input); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	err := c.BindJSON(input)
+
+	err = h.validateDatePortfolio(input)
+
+	if err != nil {
+		c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": false, "message": err.Error()})
 		return
 	}
 
 	// input.Photo = savePicture(c)
 
 	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
-
-	// user := &models.User{
-	// 	Username: "faner201",
-	// 	Password: "lopata",
-	// }
 
 	if err := h.useCase.CreatePortfolio(c.Request.Context(), user, input.Name, input.Text, input.Photo, input.Colors, input.Struct); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -99,8 +130,13 @@ func (h *Handler) CreatePortfolio(c *gin.Context) {
 func (h *Handler) CreateMenuPortfolio(c *gin.Context) {
 	input := new(createInputMenu)
 
-	if err := c.BindJSON(input); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	err := c.BindJSON(input)
+
+	err = h.validateDateMenu(input)
+
+	if err != nil {
+		c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": false, "message": err.Error()})
 		return
 	}
 

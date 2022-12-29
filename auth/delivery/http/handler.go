@@ -2,8 +2,8 @@ package http
 
 import (
 	"Portfolio_You/auth"
-	"log"
 	"net/http"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,13 +33,49 @@ type signInputToken struct {
 	Token string `json:"token"`
 }
 
+func (h *Handler) validateDate(s *SignUp) error {
+
+	for _, letter := range s.Username {
+		if unicode.IsSymbol(letter) {
+			return auth.ErrSpecialSymbolsUsername
+		}
+	}
+
+	for _, number := range s.Username {
+		if number > unicode.MaxASCII {
+			return auth.ErrInvalidLeanguage
+		}
+	}
+
+	for _, number := range s.Password {
+		if number > unicode.MaxASCII {
+			return auth.ErrInvalidLeanguage
+		}
+	}
+
+	for _, number := range s.Email {
+		if number > unicode.MaxASCII {
+			return auth.ErrInvalidLeanguage
+		}
+	}
+
+	if len(s.Username) > 30 {
+		return auth.ErrLenUsername
+	}
+
+	return nil
+}
+
 func (h *Handler) SignUp(c *gin.Context) {
 	input := new(SignUp)
 
-	log.Println(input)
+	err := c.BindJSON(input)
 
-	if err := c.BindJSON(input); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	err = h.validateDate(input)
+
+	if err != nil {
+		c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": false, "message": err.Error()})
 		return
 	}
 
@@ -58,8 +94,6 @@ func (h *Handler) SignIn(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-
-	log.Println()
 
 	token, err := h.useCase.SignIn(c.Request.Context(), input.Username, input.Password)
 	if err != nil {
