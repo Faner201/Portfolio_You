@@ -1,0 +1,44 @@
+"POST portfolio/open"
+{
+    "url" : "http://portfolio_you/name",
+    "createrUser" : "faner201",
+    "name" : "aboba",
+    "texts" : [
+        {
+            "text" : "avtobot",
+			"style" :  "limitic",
+			"size" :   "12"
+        }
+    ],
+    "images" : [
+        {
+            "src" : "cd/42342dsfs3"
+        },
+        {
+            "src" : "cd/42342dsfs3"
+        }
+    ],
+    "colors" : {
+		"base" : "#fff",
+		"text" : "#dsfsdfs",
+		"contrast" : "#fdsfsdcxs",
+		"primary" : "#fdsfsdf",
+		"secondary" : "#fdsfxz"
+	},
+    "structure" : [
+        [
+            {
+                "type" : "text",
+                "index" : "1"
+            },
+            {
+                "type" : "text",
+                "index" : "2"
+            },
+            {
+                "type" : "image",
+                "index" : "1"
+            }
+        ]
+    ]
+}
