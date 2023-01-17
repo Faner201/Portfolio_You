@@ -54,7 +54,7 @@ func (a *App) Run(port string) error {
 		gin.Logger(),
 		cors.Default(),
 	)
-	router.Static("/portfolio/open", "/Users/fanfurick/Documents/Profile_You/src") // очень строгий код, хз что с ним делать ./src вообще не хочет читать
+	router.Static("/portfolio/open", "/Users/fanfurick/Documents/Profile_You/src")
 
 	authHttp.RegisterHttpEndpoints(router, a.authUC)
 
