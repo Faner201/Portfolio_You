@@ -15,6 +15,6 @@ func RegisterHttpEndpoints(router *gin.RouterGroup, uc portfolios.UseCase) {
 		portfolioEndPoints.POST("/create/menu", h.CreateMenuPortfolio)
 		portfolioEndPoints.POST("/open", h.GetPortfolio)
 		portfolioEndPoints.GET("/menu", h.GetListMenu)
-		portfolioEndPoints.DELETE("", h.DeletePortfolio)
+		portfolioEndPoints.DELETE("/menu", h.DeletePortfolio)
 	}
 }

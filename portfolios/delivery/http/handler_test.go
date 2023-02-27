@@ -332,7 +332,7 @@ func TestDeletePortfolio(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("DELETE", "/api/portfolio", bytes.NewBuffer(body))
+	req, _ := http.NewRequest("DELETE", "/api/portfolio/menu", bytes.NewBuffer(body))
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
