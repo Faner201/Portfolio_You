@@ -7,6 +7,7 @@ REST API to create a portfolio, written using the GIN.
 - [x] `POST /sign-up` - New user registration.
 - [x] `POST /sign-in` - New user authorization.
 ---
+### Portfolio management.
 - [x] `POST /portfolio/create` - Creating a new portfolio.
 - [x] `POST /portfolio/create/menu` - Create a brief description of the portfolio.
 - [x] `POST /portfolio/open` - Viewing the portfolio made.
