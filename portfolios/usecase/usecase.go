@@ -21,29 +21,13 @@ func CreateURL(name, createrName string) string {
 	return url
 }
 
-func (p *PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, name string, text *[]models.Text,
-	photo *[]models.Photo, colors *models.Colors, structs *[][]models.Block) error {
-	portf := &models.Portfolio{
-		Url:         CreateURL(name, user.Username),
-		CreaterUser: user.Username,
-		Name:        name,
-		Text:        text,
-		Photo:       photo,
-		Colors:      colors,
-		Struct:      structs,
-	}
-	return p.portfolioRepo.CreatePortfolio(ctx, portf, user)
+func (p *PortfolioUseCase) CreatePortfolio(ctx context.Context, user *models.User, portfolio *models.Portfolio) error {
+	portfolio.Url = CreateURL(portfolio.Name, user.Username)
+	return p.portfolioRepo.CreatePortfolio(ctx, user, portfolio)
 }
 
-func (p PortfolioUseCase) CreateMenuPortfolio(ctx context.Context, user *models.User, name, shortText, photo string) error {
-	menu := &models.Menu{
-		Name:        name,
-		CreaterName: user.Username,
-		ShortText:   shortText,
-		Photo:       photo,
-	}
-
-	return p.portfolioRepo.CreateMenuPortfolio(ctx, user, menu)
+func (p PortfolioUseCase) CreateMenuPortfolio(ctx context.Context, user *models.User, menuPortfolio *models.Menu) error {
+	return p.portfolioRepo.CreateMenuPortfolio(ctx, user, menuPortfolio)
 }
 
 func (p PortfolioUseCase) OpenPortfolio(ctx context.Context, user *models.User, portfolioID string) (*models.Portfolio, error) {

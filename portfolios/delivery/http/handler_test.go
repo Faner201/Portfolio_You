@@ -2,9 +2,11 @@ package http
 
 import (
 	"Portfolio_You/models"
+	"Portfolio_You/portfolios/faker"
 	"Portfolio_You/portfolios/usecase"
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,11 +17,7 @@ import (
 )
 
 func TestCreatePortfolio(t *testing.T) {
-	user := &models.User{
-		Username: "faner201",
-		Password: "lopata",
-		Email:    "polta@mail.ru",
-	}
+	user, _ := faker.GetUser()
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
@@ -30,79 +28,25 @@ func TestCreatePortfolio(t *testing.T) {
 
 	RegisterHttpEndpoints(group, uc)
 
-	name := "aboba"
-	text := &[]models.Text{
-		{
-			Sludge: "avtobot",
-			Style:  "limitic",
-			Size:   "12",
-		},
-		{
-			Sludge: "avtobot",
-			Style:  "limitic",
-			Size:   "12",
-		},
-	}
-	photo := &[]models.Photo{
-		{
-			Addres: "cd/42342dsfs3",
-		},
-		{
-			Addres: "cd/42342dsfs3",
-		},
-	}
-	colors := &models.Colors{
-		Base:      "#fff",
-		Text:      "#dsfsdfs",
-		Contrast:  "#fdsfsdcxs",
-		Primary:   "#fdsfsdf",
-		Secondary: "#fdsfxz",
-	}
+	portf, _ := faker.GetPortfolio()
+	portf.ID = ""
+	portf.Url = ""
+	portf.CreaterUser = ""
 
-	structs := &[][]models.Block{
-		{
-			{
-				Type:     "text",
-				Location: "1",
-			},
-			{
-				Type:     "text",
-				Location: "2",
-			},
-			{
-				Type:     "image",
-				Location: "1",
-			},
-		},
-		{
-			{
-				Type:     "image",
-				Location: "2",
-			},
-			{
-				Type:     "text",
-				Location: "3",
-			},
-			{
-				Type:     "text",
-				Location: "4",
-			},
-		},
-	}
-
-	inp := &createInputPortf{
-		CreaterUser: user.Username,
-		Name:        name,
-		Text:        text,
-		Photo:       photo,
-		Colors:      colors,
-		Struct:      structs,
+	inp := &portfolioDTO{
+		Name:   portf.Name,
+		Text:   portf.Texts,
+		Images: portf.Images,
+		Colors: portf.Colors,
+		Struct: portf.Struct,
 	}
 
 	body, err := json.Marshal(inp)
 	assert.NoError(t, err)
 
-	uc.On("CreatePortfolio", user, inp.Name, inp.Text, inp.Photo, inp.Colors, inp.Struct).Return(nil)
+	log.Println(inp)
+
+	uc.On("CreatePortfolio", user, portf).Return(nil)
 
 	w := httptest.NewRecorder()
 
@@ -113,11 +57,7 @@ func TestCreatePortfolio(t *testing.T) {
 }
 
 func TestCreateMenuPortfolio(t *testing.T) {
-	user := &models.User{
-		Username: "faner201",
-		Password: "lopata",
-		Email:    "polta@mail.ru",
-	}
+	user, _ := faker.GetUser()
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
@@ -128,22 +68,13 @@ func TestCreateMenuPortfolio(t *testing.T) {
 
 	RegisterHttpEndpoints(group, uc)
 
-	name := "aboba"
-	createrName := user.Username
-	shortText := "lopol"
-	photo := "cd/34242e3"
-
-	inp := &createInputMenu{
-		Name:        name,
-		CreaterName: createrName,
-		ShortText:   shortText,
-		Photo:       photo,
-	}
+	inp, _ := faker.GetMenu()
+	inp.ID = ""
 
 	body, err := json.Marshal(inp)
 	assert.NoError(t, err)
 
-	uc.On("CreateMenuPortfolio", user, inp.Name, inp.ShortText, inp.Photo).Return(nil)
+	uc.On("CreateMenuPortfolio", user, inp).Return(nil)
 
 	w := httptest.NewRecorder()
 
@@ -155,11 +86,7 @@ func TestCreateMenuPortfolio(t *testing.T) {
 
 func TestGetPortfolio(t *testing.T) {
 
-	user := &models.User{
-		Username: "faner201",
-		Password: "lopata",
-		Email:    "polta@mail.ru",
-	}
+	user, _ := faker.GetUser()
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
@@ -170,91 +97,30 @@ func TestGetPortfolio(t *testing.T) {
 
 	RegisterHttpEndpoints(group, uc)
 
-	id := "1"
-	name := "aboba"
-	text := &[]models.Text{
-		{
-			Sludge: "avtobot",
-			Style:  "limitic",
-			Size:   "12",
-		},
-		{
-			Sludge: "avtobot",
-			Style:  "limitic",
-			Size:   "12",
-		},
-	}
-	photo := &[]models.Photo{
-		{
-			Addres: "cd/42342dsfs3",
-		},
-		{
-			Addres: "cd/42342dsfs3",
-		},
-	}
-	colors := &models.Colors{
-		Base:      "#fff",
-		Text:      "#dsfsdfs",
-		Contrast:  "#fdsfsdcxs",
-		Primary:   "#fdsfsdf",
-		Secondary: "#fdsfxz",
-	}
+	inp, _ := faker.GetPortfolio()
 
-	structs := &[][]models.Block{
-		{
-			{
-				Type:     "text",
-				Location: "1",
-			},
-			{
-				Type:     "text",
-				Location: "2",
-			},
-			{
-				Type:     "image",
-				Location: "1",
-			},
-		},
-		{
-			{
-				Type:     "image",
-				Location: "2",
-			},
-			{
-				Type:     "text",
-				Location: "3",
-			},
-			{
-				Type:     "text",
-				Location: "4",
-			},
-		},
-	}
-
-	inp := &models.Portfolio{
-		ID:          id,
-		CreaterUser: user.Username,
-		Name:        name,
-		Text:        text,
-		Photo:       photo,
-		Colors:      colors,
-		Struct:      structs,
-	}
-
-	portfId := &getPortfID{
-		ID: id,
+	portfId := &portfoliofID{
+		ID: inp.ID,
 	}
 
 	body, err := json.Marshal(portfId)
 	assert.NoError(t, err)
 
-	uc.On("OpenPortfolio", user, id).Return(inp, nil)
+	uc.On("OpenPortfolio", user, inp.ID).Return(inp, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/portfolio/open", bytes.NewBuffer(body))
 	r.ServeHTTP(w, req)
 
-	expectedOut := &getPortfolio{Portf: inp}
+	expectedOut := &portfolio{
+		Portfolio: &portfolioDTO{
+			CreaterUser: inp.CreaterUser,
+			Name:        inp.Name,
+			Text:        inp.Texts,
+			Images:      inp.Images,
+			Colors:      inp.Colors,
+			Struct:      inp.Struct,
+		}}
 	expectedOutBody, err := json.Marshal(expectedOut)
 	assert.NoError(t, err)
 
@@ -263,11 +129,7 @@ func TestGetPortfolio(t *testing.T) {
 }
 
 func TestGetListMenu(t *testing.T) {
-	user := &models.User{
-		Username: "faner201",
-		Password: "lopata",
-		Email:    "polta@mail.ru",
-	}
+	user, _ := faker.GetUser()
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
@@ -281,13 +143,8 @@ func TestGetListMenu(t *testing.T) {
 	list := []models.Menu{}
 
 	for i := 0; i < 5; i++ {
-		list = append(list, models.Menu{
-			ID:          "1",
-			Name:        "aboba",
-			CreaterName: user.Username,
-			ShortText:   "lopata",
-			Photo:       "cd/fsdfsdfs",
-		})
+		menu, _ := faker.GetMenu()
+		list = append(list, *menu)
 	}
 
 	uc.On("GetListPorfolio", user).Return(&list, nil)
@@ -296,7 +153,19 @@ func TestGetListMenu(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/portfolio/menu", nil)
 	r.ServeHTTP(w, req)
 
-	expectedOut := getMenu{Menu: &list}
+	menuDTO := []portfolioMenuDTO{}
+
+	for _, menu := range list {
+		input := portfolioMenuDTO{
+			Name:        menu.Name,
+			CreaterName: menu.CreaterName,
+			ShortText:   menu.ShortText,
+			Image:       menu.Image,
+		}
+		menuDTO = append(menuDTO, input)
+	}
+
+	expectedOut := menu{&menuDTO}
 
 	expectedOutBody, err := json.Marshal(expectedOut)
 	assert.NoError(t, err)
@@ -306,11 +175,7 @@ func TestGetListMenu(t *testing.T) {
 }
 
 func TestDeletePortfolio(t *testing.T) {
-	user := &models.User{
-		Username: "faner201",
-		Password: "lopata",
-		Email:    "polta@mail.ru",
-	}
+	user, _ := faker.GetUser()
 
 	r := gin.Default()
 	group := r.Group("/api", func(c *gin.Context) {
@@ -321,8 +186,10 @@ func TestDeletePortfolio(t *testing.T) {
 
 	RegisterHttpEndpoints(group, uc)
 
-	inp := &getPortfID{
-		ID: "1",
+	portfolio, _ := faker.GetPortfolio()
+
+	inp := &portfoliofID{
+		ID: portfolio.ID,
 	}
 
 	body, err := json.Marshal(inp)
