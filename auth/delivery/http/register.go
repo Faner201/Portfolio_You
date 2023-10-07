@@ -9,7 +9,7 @@ import (
 func RegisterHttpEndpoints(router *gin.Engine, uc auth.UseCase) {
 	h := NewHandler(uc)
 
-	authEndPoints := router.Group("")
+	authEndPoints := router.Group("/auth")
 	{
 		authEndPoints.POST("/sign-up", h.SignUp)
 		authEndPoints.POST("/sign-in", h.SignIn)

@@ -3,7 +3,6 @@ package http
 import (
 	"Portfolio_You/models"
 	"Portfolio_You/portfolios"
-	"log"
 	"net/http"
 	"unicode"
 
@@ -21,35 +20,39 @@ func NewHandler(useCase portfolios.UseCase) *Handler {
 	}
 }
 
-type createInputPortf struct {
-	CreaterUser string            `json:"createrUser" form:"createrUser"`
-	Name        string            `json:"name" form:"name"`
-	Text        *[]models.Text    `json:"texts" form:"texts"`
-	Photo       *[]models.Photo   `json:"images" form:"images"`
-	Colors      *models.Colors    `json:"colors" form:"colors"`
-	Struct      *[][]models.Block `json:"structure" form:"structure"`
+type portfolioDTO struct {
+	CreaterUser string            `json:"CreaterUser" form:"CreaterUser"`
+	Name        string            `json:"Name" form:"Name"`
+	Text        *[]models.Text    `json:"Texts" form:"Texts"`
+	Images      *[]models.Image   `json:"Images" form:"Images"`
+	Colors      *models.Colors    `json:"Colors" form:"Colors"`
+	Struct      *[][]models.Block `json:"Structure" form:"Structure"`
 }
 
-type createInputMenu struct {
-	Name        string `json:"name"`
-	CreaterName string `json:"createrName"`
-	ShortText   string `json:"shortText"`
-	Photo       string `json:"photo"`
+type portfolioMenuDTO struct {
+	Name        string `json:"Name"`
+	CreaterName string `json:"CreaterName"`
+	ShortText   string `json:"ShortText"`
+	Image       string `json:"Image"`
 }
 
-type getPortfID struct {
-	ID string `json:"id"`
+type imageDTO struct {
+	Image *[]models.Image `json:"Image"`
 }
 
-type getPortfolio struct {
-	Portf *models.Portfolio `json:"portfolio"`
+type portfoliofID struct {
+	ID string `json:"Id"`
 }
 
-type getMenu struct {
-	Menu *[]models.Menu `json:"menu"`
+type portfolio struct {
+	Portfolio *portfolioDTO `json:"Portfolio"`
 }
 
-func (h *Handler) validateDatePortfolio(p *createInputPortf) error {
+type menu struct {
+	Menu *[]portfolioMenuDTO `json:"Menu"`
+}
+
+func (h *Handler) validateDatePortfolio(p *portfolioDTO) error {
 
 	for _, letter := range p.Name {
 		if unicode.IsSymbol(letter) {
@@ -67,59 +70,67 @@ func (h *Handler) validateDatePortfolio(p *createInputPortf) error {
 	return nil
 }
 
-func (h *Handler) validateDateMenu(m *createInputMenu) error {
+func (h *Handler) validateDateMenu(m *portfolioMenuDTO) error {
 	for _, letter := range m.Name {
 		if unicode.IsSymbol(letter) {
 			return portfolios.ErrSpecialSymbolName
 		}
 	}
-
-	//возможно нужно будет валидировать что есть фотка и текст
-
 	return nil
 }
 
-func (h *Handler) savePicture(c *gin.Context) *[]models.Photo {
-	form, _ := c.MultipartForm()
+func (h *Handler) savePicture(c *gin.Context) *imageDTO {
+	form, err := c.MultipartForm()
+	if err != nil {
+		return nil
+	}
 	photos := form.File["photo"]
 
-	model := new(models.Photo)
-	list := []models.Photo{}
+	list := []models.Image{}
 
 	for _, photo := range photos {
 		c.SaveUploadedFile(photo, photo.Filename)
-		model.Addres = photo.Filename
-		list = append(list, *model)
+		list = append(list, models.Image{
+			Src: photo.Filename,
+		})
 	}
 
-	return &list
+	return &imageDTO{
+		Image: &list,
+	}
 }
 
 func (h *Handler) CreatePortfolio(c *gin.Context) {
-	input := new(createInputPortf)
+	input := new(portfolioDTO)
 
-	// if err := c.ShouldBind(input); err != nil {
-	// 	c.AbortWithStatus(http.StatusBadRequest)
-	// 	return
-	// }
+	if err := c.ShouldBind(input); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
 
-	// log.Println(input)
+	if err := c.BindJSON(input); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
 
-	err := c.BindJSON(input)
-
-	err = h.validateDatePortfolio(input)
+	err := h.validateDatePortfolio(input)
 
 	if err != nil {
 		c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": false, "message": err.Error()})
 		return
 	}
-
-	// input.Photo = savePicture(c)
+	// input.Images = h.savePicture(c).Image
 
 	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
 
-	if err := h.useCase.CreatePortfolio(c.Request.Context(), user, input.Name, input.Text, input.Photo, input.Colors, input.Struct); err != nil {
+	if err := h.useCase.CreatePortfolio(c.Request.Context(), user, &models.Portfolio{
+		Name:   input.Name,
+		Texts:  input.Text,
+		Images: input.Images,
+		Colors: input.Colors,
+		Struct: input.Struct,
+	}); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -128,11 +139,14 @@ func (h *Handler) CreatePortfolio(c *gin.Context) {
 }
 
 func (h *Handler) CreateMenuPortfolio(c *gin.Context) {
-	input := new(createInputMenu)
+	input := new(portfolioMenuDTO)
 
-	err := c.BindJSON(input)
+	if err := c.BindJSON(input); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
 
-	err = h.validateDateMenu(input)
+	err := h.validateDateMenu(input)
 
 	if err != nil {
 		c.Error(err)
@@ -142,8 +156,12 @@ func (h *Handler) CreateMenuPortfolio(c *gin.Context) {
 
 	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
 
-	if err := h.useCase.CreateMenuPortfolio(c.Request.Context(), user, input.Name,
-		input.ShortText, input.Photo); err != nil {
+	if err := h.useCase.CreateMenuPortfolio(c.Request.Context(), user, &models.Menu{
+		Name:        input.Name,
+		CreaterName: input.CreaterName,
+		ShortText:   input.ShortText,
+		Image:       input.Image,
+	}); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -152,88 +170,30 @@ func (h *Handler) CreateMenuPortfolio(c *gin.Context) {
 }
 
 func (h *Handler) GetPortfolio(c *gin.Context) {
-	input := new(getPortfID)
+	input := new(portfoliofID)
 
 	if err := c.BindJSON(input); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	log.Println(input)
-
 	user := c.MustGet(viper.GetString("privileges.user")).(*models.User)
+	portf, err := h.useCase.OpenPortfolio(c.Request.Context(), user, input.ID)
 
-	// user := &models.User{
-	// 	Username: "faner201",
-	// 	Password: "lopata",
-	// }
-
-	portf, err := h.useCase.OpenPortfolio(c.Request.Context(), user, input.ID) // местная заглушка для решения проблемы получения id с фронта
-	// portf = &models.Portfolio{
-	// 	Url:         "/portfolios/aboba&faner201",
-	// 	CreaterUser: user.Username,
-	// 	Name:        "aboba",
-	// 	Text: &[]models.Text{
-	// 		{
-	// 			Sludge: "Хотел бы сказать этому артёму",
-	// 			Style:  "bold",
-	// 			Size:   "big",
-	// 		},
-	// 		{
-	// 			Sludge: "Был бы ты человеком, а не дотером",
-	// 			Style:  "italic",
-	// 			Size:   "small",
-	// 		},
-	// 	},
-	// 	Photo: &[]models.Photo{
-	// 		{
-	// 			Addres: "/Users/fanfurick/Documents/Profile_You/src/photo.jpeg",
-	// 		},
-	// 		{
-	// 			Addres: "/Users/fanfurick/Documents/Profile_You/src/photo.jpeg",
-	// 		},
-	// 	},
-	// 	Colors: &models.Colors{
-	// 		Base:      "#4f634b",
-	// 		Text:      "#79a5b3",
-	// 		Contrast:  "#794e8a",
-	// 		Primary:   "#7d8f49",
-	// 		Secondary: "#d3f76a",
-	// 	},
-	// 	Struct: &[][]models.Block{
-	// 		{
-	// 			{
-	// 				Type:     "text",
-	// 				Location: "1",
-	// 			},
-	// 			{
-	// 				Type:     "text",
-	// 				Location: "1",
-	// 			},
-	// 		},
-	// 		{
-	// 			{
-	// 				Type:     "image",
-	// 				Location: "1",
-	// 			},
-	// 			{
-	// 				Type:     "text",
-	// 				Location: "0",
-	// 			},
-	// 			{
-	// 				Type:     "text",
-	// 				Location: "1",
-	// 			},
-	// 		},
-	// 	},
-	// } // ужасная заглушка для просмотра отображения инфы с бэка на фронт
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, &getPortfolio{
-		Portf: portf,
+	c.JSON(http.StatusOK, &portfolio{
+		Portfolio: &portfolioDTO{
+			CreaterUser: portf.CreaterUser,
+			Name:        portf.Name,
+			Text:        portf.Texts,
+			Images:      portf.Images,
+			Colors:      portf.Colors,
+			Struct:      portf.Struct,
+		},
 	})
 }
 
@@ -246,13 +206,24 @@ func (h *Handler) GetListMenu(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, &getMenu{
-		Menu: list,
+	menuList := []portfolioMenuDTO{}
+
+	for _, menu := range *list {
+		menuList = append(menuList, portfolioMenuDTO{
+			Name:        menu.Name,
+			CreaterName: menu.CreaterName,
+			ShortText:   menu.ShortText,
+			Image:       menu.Image,
+		})
+	}
+
+	c.JSON(http.StatusOK, &menu{
+		Menu: &menuList,
 	})
 }
 
 func (h *Handler) DeletePortfolio(c *gin.Context) {
-	input := new(getPortfID)
+	input := new(portfoliofID)
 
 	if err := c.BindJSON(input); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)

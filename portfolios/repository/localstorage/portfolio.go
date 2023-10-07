@@ -21,13 +21,13 @@ func NewPortfolioLocalStorage() *PortfolioLocalStorage {
 	}
 }
 
-func (p *PortfolioLocalStorage) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio, user *models.User) error {
+func (p *PortfolioLocalStorage) CreatePortfolio(ctx context.Context, user *models.User, portfolio *models.Portfolio) error {
 	portfolio.CreaterUser = user.Username
 
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
-	if portfolio.Name != "" && portfolio.Struct != nil && portfolio.Photo != nil &&
-		portfolio.Text != nil && portfolio.Url != "" && portfolio.CreaterUser != "" {
+	if portfolio.Name != "" && portfolio.Struct != nil && portfolio.Images != nil &&
+		portfolio.Texts != nil && portfolio.Url != "" && portfolio.CreaterUser != "" {
 		p.portf[portfolio.ID] = portfolio
 		return nil
 	}
@@ -35,13 +35,13 @@ func (p *PortfolioLocalStorage) CreatePortfolio(ctx context.Context, portfolio *
 	return portfolios.ErrCreatePortfolio
 }
 
-func (p *PortfolioLocalStorage) CreateMenuPortfolio(ctx context.Context, user *models.User, menu *models.Menu) error {
-	menu.CreaterName = user.Username
+func (p *PortfolioLocalStorage) CreateMenuPortfolio(ctx context.Context, user *models.User, menuPortfolio *models.Menu) error {
+	menuPortfolio.CreaterName = user.Username
 
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
-	if menu.Name != "" && menu.ShortText != "" {
-		p.menus[menu.ID] = menu
+	if menuPortfolio.Name != "" && menuPortfolio.ShortText != "" {
+		p.menus[menuPortfolio.ID] = menuPortfolio
 		return nil
 	}
 

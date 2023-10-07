@@ -11,8 +11,8 @@ type PortfolioMock struct {
 	mock.Mock
 }
 
-func (m *PortfolioMock) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio, user *models.User) error {
-	args := m.Called(portfolio, user) // тут падает тест  usecase
+func (m *PortfolioMock) CreatePortfolio(ctx context.Context, user *models.User, portfolio *models.Portfolio) error {
+	args := m.Called(portfolio, user)
 
 	return args.Error(0)
 }

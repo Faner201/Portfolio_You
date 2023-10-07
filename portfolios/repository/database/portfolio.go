@@ -19,15 +19,15 @@ func NewPortfolioRepository(db *mongo.Database, collection string) *PortfolioRep
 	}
 }
 
-func (p PortfolioRepository) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio, user *models.User) error {
+func (p PortfolioRepository) CreatePortfolio(ctx context.Context, user *models.User, portfolio *models.Portfolio) error {
 
 	res, err := p.db.InsertOne(ctx, &models.Portfolio{
 		ID:          primitive.NewObjectID().Hex(),
 		Url:         portfolio.Url,
 		CreaterUser: user.Username,
 		Name:        portfolio.Name,
-		Text:        portfolio.Text,
-		Photo:       portfolio.Photo,
+		Texts:       portfolio.Texts,
+		Images:      portfolio.Images,
 		Colors:      portfolio.Colors,
 		Struct:      portfolio.Struct,
 	})
@@ -41,11 +41,11 @@ func (p PortfolioRepository) CreatePortfolio(ctx context.Context, portfolio *mod
 	return nil
 }
 
-func (p PortfolioRepository) CreateMenuPortfolio(ctx context.Context, user *models.User, menu *models.Menu) error {
+func (p PortfolioRepository) CreateMenuPortfolio(ctx context.Context, user *models.User, menuPortfolio *models.Menu) error {
 	portfolio := &models.Portfolio{}
 	out := p.db.FindOne(ctx, bson.M{
-		"name":        menu.Name,
-		"createrUser": menu.CreaterName,
+		"name":        menuPortfolio.Name,
+		"createrUser": menuPortfolio.CreaterName,
 	}).Decode(portfolio)
 
 	if out != nil {
@@ -54,44 +54,35 @@ func (p PortfolioRepository) CreateMenuPortfolio(ctx context.Context, user *mode
 
 	res, err := p.db.InsertOne(ctx, &models.Menu{
 		ID:          portfolio.ID,
-		Name:        menu.Name,
+		Name:        menuPortfolio.Name,
 		CreaterName: user.Username,
-		ShortText:   menu.ShortText,
-		Photo:       menu.Photo,
+		ShortText:   menuPortfolio.ShortText,
+		Image:       menuPortfolio.Image,
 	})
 
 	if err != nil {
 		return err
 	}
 
-	menu.ID = res.InsertedID.(primitive.ObjectID).Hex()
+	menuPortfolio.ID = res.InsertedID.(primitive.ObjectID).Hex()
 
 	return nil
 }
 
 func (p PortfolioRepository) GetPortfolioByUserName(ctx context.Context, userName, portfolioID string) (*models.Portfolio, error) {
 
-	modelPortfolio := &models.Portfolio{}
+	modelPortfolio := models.Portfolio{}
 
-	result := p.db.FindOne(ctx, bson.M{
+	err := p.db.FindOne(ctx, bson.M{
 		"id":          portfolioID,
 		"createrUser": userName,
-	}).Decode(modelPortfolio)
+	}).Decode(&modelPortfolio)
 
-	if result != nil {
-		return nil, result
+	if err != nil {
+		return nil, err
 	}
 
-	return &models.Portfolio{
-		ID:          modelPortfolio.ID,
-		Url:         modelPortfolio.Url,
-		CreaterUser: modelPortfolio.CreaterUser,
-		Name:        modelPortfolio.Name,
-		Text:        modelPortfolio.Text,
-		Photo:       modelPortfolio.Photo,
-		Colors:      modelPortfolio.Colors,
-		Struct:      modelPortfolio.Struct,
-	}, nil
+	return &modelPortfolio, nil
 }
 
 func (p PortfolioRepository) GetListPortfolioByUserName(ctx context.Context, userName string) (*[]models.Menu, error) {
